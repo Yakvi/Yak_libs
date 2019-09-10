@@ -8,7 +8,7 @@ extern "C"
 //
 // NOTE: Assertions
 //
-#if DEBUG
+#ifdef DEBUG
 #define Assert(Expression) if (!(Expression)) { *(int *)0 = 0; } // Point to sector 0, immediately crash
 #else
 #define Assert(Expression)
