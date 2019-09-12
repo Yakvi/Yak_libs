@@ -106,7 +106,7 @@ GetNextTestSlot(const char* Name)
 }
 
 inline void
-PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name = "")
+PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name)
 {
     GlobalCurrentTestSlot->ConditionCount++;
     
