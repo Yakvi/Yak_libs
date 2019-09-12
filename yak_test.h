@@ -6,12 +6,12 @@
 // YTestShowResults();              // Call after you define your tests.
 // YTestCleanup();                  // Call if you wish to reset your tests with new data.
 // Y_TEST_CATEGORY(Description);    Use this to split your tests into groups. Not nestable.
-// Y_ASSERT(Name, Test);            Define your tests. These are executed right away, the results are stored for later use.
+// Y_ASSERT(Test, Name);            Define your tests. These are executed right away, the results are stored for later use.
 //
 //
 
 #include <malloc.h>
-#include <stdio.h>
+#include <stdio.h> // TODO STB
 // TODO: Platform specific allocs
 #define ALLOC(item) (item*)malloc(sizeof(item))
 #define FREELISTITEM(item, temp) \
@@ -26,7 +26,7 @@ struct condition;
 struct test;
 
 inline void GetNextTestSlot(const char* Name);
-inline void PopulateConditionAndAdvance(const char* Name, const char* TestText, size_t TestValue);
+inline void PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name);
 static condition* InitializeTestGlobals();
 
 static test* GlobalFirstTestSlot;
@@ -34,7 +34,7 @@ static test* GlobalCurrentTestSlot;
 static condition* GlobalCurrentCondition = InitializeTestGlobals();
 
 #define Y_TEST_CATEGORY(Name) GetNextTestSlot(Name);
-#define Y_ASSERT(Name, Test) PopulateConditionAndAdvance(Name, #Test, (size_t)Test);
+#define Y_ASSERT(Test, Name) PopulateConditionAndAdvance(#Test, (size_t)Test, Name);
 
 //
 // BOOKMARK: IMPLEMENTATION
@@ -106,7 +106,7 @@ GetNextTestSlot(const char* Name)
 }
 
 inline void
-PopulateConditionAndAdvance(const char* Name, const char* TestText, size_t TestValue)
+PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name = "")
 {
     GlobalCurrentTestSlot->ConditionCount++;
     
