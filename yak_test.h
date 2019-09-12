@@ -34,7 +34,7 @@ static test* GlobalCurrentTestSlot;
 static condition* GlobalCurrentCondition = InitializeTestGlobals();
 
 #define Y_TEST_CATEGORY(Name) GetNextTestSlot(Name);
-#define Y_ASSERT(Test, Name) PopulateConditionAndAdvance(#Test, (size_t)Test, Name);
+#define Y_ASSERT(Test, Name) PopulateConditionAndAdvance(#Test, (size_t)(Test), (Name));
 
 //
 // BOOKMARK: IMPLEMENTATION
