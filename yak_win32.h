@@ -1,6 +1,6 @@
 #if !defined(YAK_WIN32)
 
-#ifdef _WIN32
+#if defined _WIN32
 
 #define WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
@@ -43,6 +43,10 @@
 #define NODEFERWINDOWPOS
 #define NOMCX
 
+#ifdef APIENTRY
+#undef APIENTRY
+#endif // APIENTRY
+
 #include <windows.h>
 #include <winnt.h>
 #include <fileapi.h>   // kernel32.lib
@@ -55,7 +59,7 @@ struct file
     void* Contents;
 };
 
-#ifdef _DEBUG
+#ifdef DEBUG
 #include <debugapi.h>
 #define Yak_Log(Message) OutputDebugStringA(Message)
 #else
@@ -65,6 +69,7 @@ struct file
 void*
 Yak_GetMemory(size_t Size)
 {
+    // TODO: allow for custom memory callbacks
     return VirtualAlloc(0, Size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 }
 
@@ -77,6 +82,7 @@ Yak_FreeMemory(void* Memory)
     }
 }
 
+// TODO: Return by pointer? 
 file
 Yak_ReadFile(char* Filename)
 {
@@ -138,6 +144,47 @@ Yak_ReadFile(char* Filename)
 
     return (Result);
 }
+
+#undef WIN32_LEAN_AND_MEAN
+#undef NOGDICAPMASKS
+#undef NOVIRTUALKEYCODES
+#undef NOWINMESSAGES
+#undef NOWINSTYLES
+#undef NOSYSMETRICS
+#undef NOMENUS
+#undef NOICONS
+#undef NOKEYSTATES
+#undef NOSYSCOMMANDS
+#undef NORASTEROPS
+#undef NOSHOWWINDOW
+#undef OEMRESOURCE
+#undef NOATOM
+#undef NOCLIPBOARD
+#undef NOCOLOR
+#undef NOCTLMGR
+#undef NODRAWTEXT
+#undef NOGDI
+#undef NOKERNEL
+#undef NOUSER
+#undef NONLS
+#undef NOMB
+#undef NOMEMMGR
+#undef NOMETAFILE
+#undef NOMINMAX
+#undef NOMSG
+#undef NOOPENFILE
+#undef NOSCROLL
+#undef NOSERVICE
+#undef NOSOUND
+#undef NOTEXTMETRIC
+#undef NOWH
+#undef NOWINOFFSETS
+#undef NOCOMM
+#undef NOKANJI
+#undef NOHELP
+#undef NOPROFILER
+#undef NODEFERWINDOWPOS
+#undef NOMCX
 
 #endif
 
