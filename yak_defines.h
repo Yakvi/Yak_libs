@@ -74,6 +74,7 @@ typedef size_t memory_index;
 typedef float f32;
 typedef double f64;
 #else
+#error something
 #include <stdint.h>
 typedef int8_t s8;
 typedef int16_t s16;
@@ -121,7 +122,9 @@ inline b32 FillBuffer(char* Source, char *Dest, u32 MaxLength)
 // NOTE: Array Utilities
 // 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
-#define InArray(Count, Array) (Count < ArrayCount(Array))
+#define InArray(Count, Array) ((Count) < ArrayCount(Array))
+#define Min(a, b) ((a) < (b) ? (a) : (b))
+#define Max(a, b) ((a) > (b) ? (a) : (b))
 // TODO: swap, min, max ... macros?
 
 //
@@ -129,9 +132,9 @@ inline b32 FillBuffer(char* Source, char *Dest, u32 MaxLength)
 // 
 #define AlignPow2(Value, Alignment) \
     ((Value + ((Alignment)-1)) & ~((Alignment)-1))
-#define Align4(Value) ((Value + 3) & ~3)
-#define Align8(Value) ((Value + 7) & ~7)
-#define Align16(Value) ((Value + 15) & ~15)
+#define Align4(Value) (((Value) + 3) & ~3)
+#define Align8(Value) (((Value) + 7) & ~7)
+#define Align16(Value) (((Value) + 15) & ~15)
 
 #define Pi32 3.14159265359f
 #define Tau32 6.28318530717958647692f
