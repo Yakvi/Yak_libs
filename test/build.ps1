@@ -96,8 +96,15 @@ $CompileTime = $CompileTimer.Elapsed
 Write-Host ""
 Write-Host "[$(Get-Date -Format $dateFormat)]: " -ForegroundColor "Yellow" -NoNewLine 
 Write-Host "Compilation finished in " -ForegroundColor "Cyan" -NoNewLine
-Write-Host $([string]::Format("{0:d1}s {1:d3}ms",
-                              $CompileTime.seconds,
-                              $CompileTime.milliseconds)) -ForegroundColor "Green"
+Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $CompileTime.seconds, $CompileTime.milliseconds)) -ForegroundColor "Green"
+
+### BOOKMARK: Running tests
+
+$StringTestTimer = [System.Diagnostics.Stopwatch]::StartNew()
+
+./yak_string_test.exe
+
+$StringTestTime = $StringTestTimer.Elapsed
+Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $StringTestTime.seconds, $StringTestTime.milliseconds)) -ForegroundColor "Green"
 
 popd

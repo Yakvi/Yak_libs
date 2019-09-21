@@ -46,50 +46,52 @@ void
 InvertString(char* Source)
 {
     // TODO: cleanup this
-    const int TempBufferLength = 200;
-    char Temp[TempBufferLength] = {};
-    StringCopy(Source, Temp + 1, TempBufferLength - 1);
-    char* At = Temp + TempBufferLength - 1;
-    while (!*At)
+    if (*(Source + 1))
     {
-        --At;
+        const int TempBufferLength = 200;
+        char Temp[TempBufferLength] = {};
+        StringCopy(Source, Temp + 1, TempBufferLength - 1);
+        char* At = Temp + TempBufferLength - 1;
+        while (!*At)
+        {
+            --At;
+        }
+        while (*At)
+        {
+            *Source++ = *At--;
+        }
     }
-    while (*At)
+}
+
+#define ENCODING_START 48
+#define BYTE_TOP_BIT_MASK 0b100
+// #define BYTE_MASK 0xF
+
+char*
+UintToCharRecursive(unsigned int Input, char* Output, int &Depth)
+{
+    int Value = Input;
+    if (Input > 9)
     {
-        *Source++ = *At--;
+        UintToCharRecursive((unsigned int)(Input * 0.1f), Output, Depth);
+        Depth++;
+        Value = Input % 10;
     }
+    else if ((Value & BYTE_TOP_BIT_MASK) > 7)
+    {
+        Value = (Input & 0b111) - 2;
+    }
+
+    Output[Depth] = (char)(Value + ENCODING_START);
+
+    return (Output);
 }
 
 char*
 UintToChar(unsigned int Input, char* Output)
 {
-    int TopMask = 0xF;
-    int ByteTopBitMask = 0b1000;
-    int ByteMidBitsMask = 0b110;
-
-    int BotByte = Input & TopMask;
-    int EncodingStart = 48;
-    // Eliminate top value from A-F
-    int Value = 0;
-    if (BotByte & ByteTopBitMask) // Value is 8-15
-    {
-
-        if (!(BotByte & ByteMidBitsMask)) // Value is 11-15
-        {
-        }
-        else // Value is 8-10
-        {
-            Input = Input >> 3;
-            Value = (BotByte & 0b111) - 2;
-        }
-        *Output = (char)(Value + EncodingStart);
-        UintToChar(Input, Output + 1);
-        InvertString(Output);
-    }
-    else // Value is 0-9
-    {
-        *Output = (char)(BotByte + EncodingStart);
-    }
+    int Depth = 0;
+    UintToCharRecursive(Input, Output, Depth);
 
     return (Output);
 }
@@ -114,11 +116,19 @@ main()
     }
 #endif
 #if 1
-    Y_TEST_CATEGORY("u32 to char");
+    Y_TEST_CATEGORY("uint to char");
     {
-        char Out[10] = {};
+        char Out[33] = {};
         Y_ASSERT(CompareStrings(UintToChar(0, Out), "0"), "Pass 0 return 0");
+        Y_ASSERT(CompareStrings(UintToChar(1, Out), "1"), "Pass 1 return 1");
         Y_ASSERT(CompareStrings(UintToChar(2, Out), "2"), "Pass 2 return 2");
+        Y_ASSERT(CompareStrings(UintToChar(3, Out), "3"), "Pass 3 return 3");
+        Y_ASSERT(CompareStrings(UintToChar(4, Out), "4"), "Pass 4 return 4");
+        Y_ASSERT(CompareStrings(UintToChar(5, Out), "5"), "Pass 5 return 5");
+        Y_ASSERT(CompareStrings(UintToChar(6, Out), "6"), "Pass 6 return 6");
+        Y_ASSERT(CompareStrings(UintToChar(7, Out), "7"), "Pass 7 return 7");
+        Y_ASSERT(CompareStrings(UintToChar(8, Out), "8"), "Pass 8 return 8");
+        Y_ASSERT(CompareStrings(UintToChar(9, Out), "9"), "Pass 9 return 9");
         Y_ASSERT(CompareStrings(UintToChar(10, Out), "10"), "Pass 10 return 10");
         Y_ASSERT(CompareStrings(UintToChar(11, Out), "11"), "Pass 11 return 11");
         Y_ASSERT(CompareStrings(UintToChar(12, Out), "12"), "Pass 12 return 12");
@@ -126,6 +136,10 @@ main()
         Y_ASSERT(CompareStrings(UintToChar(14, Out), "14"), "Pass 14 return 14");
         Y_ASSERT(CompareStrings(UintToChar(15, Out), "15"), "Pass 15 return 15");
         Y_ASSERT(CompareStrings(UintToChar(16, Out), "16"), "Pass 16 return 16");
+        Y_ASSERT(CompareStrings(UintToChar(17, Out), "17"), "Pass 17 return 17");
+        Y_ASSERT(CompareStrings(UintToChar(18, Out), "18"), "Pass 18 return 18");
+        Y_ASSERT(CompareStrings(UintToChar(19, Out), "19"), "Pass 19 return 19");
+        Y_ASSERT(CompareStrings(UintToChar(100, Out), "100"), "Pass 100 return 100");
     }
 #endif
 
