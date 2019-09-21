@@ -135,10 +135,9 @@ YTestShowResults(void)
                  Condition = Condition->Next)
             {
                 // TODO: Colored text
-                printf("\t- %-30s: %s (test input: '%s')\n",
+                printf("  - %-20s: %s\n",
                        Condition->Description,
-                       Condition->Result ? "PASSED" : "FAILED",
-                       Condition->TestDescription);
+                       Condition->Result ? "PASSED" : "FAILED");
             }
         }
     }
