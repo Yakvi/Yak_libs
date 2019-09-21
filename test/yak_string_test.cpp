@@ -68,7 +68,7 @@ InvertString(char* Source)
 // #define BYTE_MASK 0xF
 
 char*
-UintToCharRecursive(unsigned int Input, char* Output, int &Depth)
+UintToCharRecursive(unsigned int Input, char* Output, int& Depth)
 {
     int Value = Input;
     if (Input > 9)
@@ -77,7 +77,7 @@ UintToCharRecursive(unsigned int Input, char* Output, int &Depth)
         Depth++;
         Value = Input % 10;
     }
-    else if ((Value & BYTE_TOP_BIT_MASK) > 7)
+    else if (Value > 7)
     {
         Value = (Input & 0b111) - 2;
     }
@@ -92,6 +92,7 @@ UintToChar(unsigned int Input, char* Output)
 {
     int Depth = 0;
     UintToCharRecursive(Input, Output, Depth);
+    Output[Depth + 1] = 0;
 
     return (Output);
 }
@@ -140,6 +141,10 @@ main()
         Y_ASSERT(CompareStrings(UintToChar(18, Out), "18"), "Pass 18 return 18");
         Y_ASSERT(CompareStrings(UintToChar(19, Out), "19"), "Pass 19 return 19");
         Y_ASSERT(CompareStrings(UintToChar(100, Out), "100"), "Pass 100 return 100");
+        Y_ASSERT(CompareStrings(UintToChar(20, Out), "20"), "Pass 20 return 20");
+        Y_ASSERT(CompareStrings(UintToChar(35, Out), "35"), "Pass 35 return 35");
+        Y_ASSERT(CompareStrings(UintToChar(10506, Out), "10506"), "Pass 10506 return 10506");
+        Y_ASSERT(CompareStrings(UintToChar(1, Out), "1"), "Pass 1 return 1");
     }
 #endif
 
