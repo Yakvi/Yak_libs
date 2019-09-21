@@ -26,6 +26,40 @@ CompareStrings(char* A, char* B)
     return (Result);
 }
 
+void
+StringCopy(char* Source, char* Dest, int MaxLength)
+{
+    // TODO: cleanup this
+    int CharCount = 0;
+    while (*Source)
+    {
+        if (CharCount++ >= MaxLength)
+        {
+            // TODO: Error
+            break;
+        }
+        *Dest++ = *Source++;
+    }
+}
+
+void
+InvertString(char* Source)
+{
+    // TODO: cleanup this
+    const int TempBufferLength = 200;
+    char Temp[TempBufferLength] = {};
+    StringCopy(Source, Temp + 1, TempBufferLength - 1);
+    char* At = Temp + TempBufferLength - 1;
+    while (!*At)
+    {
+        --At;
+    }
+    while (*At)
+    {
+        *Source++ = *At--;
+    }
+}
+
 char*
 UintToChar(unsigned int Input, char* Output)
 {
@@ -50,14 +84,13 @@ UintToChar(unsigned int Input, char* Output)
         }
         *Output = (char)(Value + EncodingStart);
         UintToChar(Input, Output + 1);
+        InvertString(Output);
     }
     else // Value is 0-9
     {
-        Value = BotByte;
-        *Output = (char)(Value + EncodingStart);
+        *Output = (char)(BotByte + EncodingStart);
     }
 
-    RevertString(Output);
     return (Output);
 }
 
@@ -88,6 +121,11 @@ main()
         Y_ASSERT(CompareStrings(UintToChar(2, Out), "2"), "Pass 2 return 2");
         Y_ASSERT(CompareStrings(UintToChar(10, Out), "10"), "Pass 10 return 10");
         Y_ASSERT(CompareStrings(UintToChar(11, Out), "11"), "Pass 11 return 11");
+        Y_ASSERT(CompareStrings(UintToChar(12, Out), "12"), "Pass 12 return 12");
+        Y_ASSERT(CompareStrings(UintToChar(13, Out), "13"), "Pass 13 return 13");
+        Y_ASSERT(CompareStrings(UintToChar(14, Out), "14"), "Pass 14 return 14");
+        Y_ASSERT(CompareStrings(UintToChar(15, Out), "15"), "Pass 15 return 15");
+        Y_ASSERT(CompareStrings(UintToChar(16, Out), "16"), "Pass 16 return 16");
     }
 #endif
 
