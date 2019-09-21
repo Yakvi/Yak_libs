@@ -26,45 +26,45 @@ CompareStrings(char* A, char* B)
     return (Result);
 }
 
-void
-StringCopy(char* Source, char* Dest, int MaxLength)
-{
-    // TODO: cleanup this
-    int CharCount = 0;
-    while (*Source)
-    {
-        if (CharCount++ >= MaxLength)
-        {
-            // TODO: Error
-            break;
-        }
-        *Dest++ = *Source++;
-    }
-}
+// void
+// StringCopy(char* Source, char* Dest, int MaxLength)
+// {
+//     // TODO: cleanup this
+//     int CharCount = 0;
+//     while (*Source)
+//     {
+//         if (CharCount++ >= MaxLength)
+//         {
+//             // TODO: Error
+//             break;
+//         }
+//         *Dest++ = *Source++;
+//     }
+// }
 
-void
-InvertString(char* Source)
-{
-    // TODO: cleanup this
-    if (*(Source + 1))
-    {
-        const int TempBufferLength = 200;
-        char Temp[TempBufferLength] = {};
-        StringCopy(Source, Temp + 1, TempBufferLength - 1);
-        char* At = Temp + TempBufferLength - 1;
-        while (!*At)
-        {
-            --At;
-        }
-        while (*At)
-        {
-            *Source++ = *At--;
-        }
-    }
-}
+// void
+// InvertString(char* Source)
+// {
+//     // TODO: cleanup this
+//     if (*(Source + 1))
+//     {
+//         const int TempBufferLength = 200;
+//         char Temp[TempBufferLength] = {};
+//         StringCopy(Source, Temp + 1, TempBufferLength - 1);
+//         char* At = Temp + TempBufferLength - 1;
+//         while (!*At)
+//         {
+//             --At;
+//         }
+//         while (*At)
+//         {
+//             *Source++ = *At--;
+//         }
+//     }
+// }
 
 #define ENCODING_START 48
-#define BYTE_TOP_BIT_MASK 0b100
+// #define BYTE_TOP_BIT_MASK 0b100
 // #define BYTE_MASK 0xF
 
 char*
@@ -76,10 +76,6 @@ UintToCharRecursive(unsigned int Input, char* Output, int& Depth)
         UintToCharRecursive((unsigned int)(Input * 0.1f), Output, Depth);
         Depth++;
         Value = Input % 10;
-    }
-    else if (Value > 7)
-    {
-        Value = (Input & 0b111) - 2;
     }
 
     Output[Depth] = (char)(Value + ENCODING_START);
