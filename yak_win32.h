@@ -64,7 +64,7 @@ struct file
 #define Yak_Log(Message) OutputDebugStringA(Message)
 #else
 #define Yak_Log(Message)
-#endif // _DEBUG
+#endif // DEBUG
 
 void*
 Yak_GetMemory(size_t Size)

@@ -1,0 +1,6 @@
+.vscode
+data
+build
+
+cloc.ps1
+static_check.bat
