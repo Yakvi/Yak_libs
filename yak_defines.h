@@ -96,28 +96,6 @@ typedef double f64;
 #define Gigabytes(Value) (Megabytes(Value) * 1024LL)
 #define Terabytes(Value) (Gigabytes(Value) * 1024LL)
 
-//
-// NOTE: String utlities
-// 
-typedef char const* str; // TODO: what happens to it in memory? Possible leaks?
-inline b32 FillBuffer(char* Source, char *Dest, u32 MaxLength)
-{
-    b32 Result = true;
-    u32 BufferIndex = 0;
-    char *At = Source;
-    while(At)
-    {
-        Dest[BufferIndex++] = *At++;
-        if(BufferIndex >= MaxLength)
-        {
-            Result = false;
-            break;
-        }
-    }
-    
-    return(Result);
-}
-
 // 
 // NOTE: Array Utilities
 // 
