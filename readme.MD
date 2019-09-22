@@ -5,7 +5,10 @@ The libraries are developed in C but may use some C++ features (and will be comp
 
 Currently it houses the following libraries in very early stages of development:
 
-* Length-specific defines and quick macros: [yak_defines.h](../blob/master/yak_defines.h)
+* Mostly type defines and stuff that currently doesn't have an own library: [yak_defines.h](../blob/master/yak_defines.h)
 * A lightweight unit testing framework (include your code in your test file and define your tests!): [yak_test.h](../blob/master/yak_test.h)
+* String operations: [yak_string.h](../blob/master/yak_string.h)
+* Memory management: [yak_memory.h](../blob/master/yak_memory.h)
+* Win32 Platform layer: [yak_win32.h](../blob/master/yak_win32.h)
 
-I'm committing to regularly update these and new libraries for the benefit of everyone.
+I'm committing to regularly update these libraries and new ones for the benefit of everyone.

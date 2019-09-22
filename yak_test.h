@@ -10,6 +10,8 @@
 //
 //
 
+#include <yak_memory.h>
+EXTERN_C_START
 #define STB_SPRINTF_IMPLEMENTATION
 #define STB_SPRINTF_NOFLOAT
 #include <stb/stb_sprintf.h>
@@ -185,6 +187,6 @@ YakTest_Cleanup(void)
     // Reinitialize the globals
     YAK_GLOBAL__CurrentCondition = Yak__InitializeTestGlobals();
 }
-
+EXTERN_C_END
 #define YAK_TEST 1
 #endif // !(YAK_TEST)

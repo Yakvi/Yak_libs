@@ -89,7 +89,7 @@ Yak__UintToCharRecursive(unsigned int Input, char* Output, int& Depth)
 }
 
 char*
-UintToChar(unsigned int Input, char* Output)
+Yak_UintToChar(unsigned int Input, char* Output)
 {
     int Depth = 0;
     Yak__UintToCharRecursive(Input, Output, Depth);
@@ -99,7 +99,7 @@ UintToChar(unsigned int Input, char* Output)
 }
 
 inline bool
-FillBuffer(char* Source, char *Dest, size_t MaxLength)
+Yak_FillBuffer(char* Source, char *Dest, size_t MaxLength)
 {
     bool Result = true;
     size_t BufferIndex = 0;

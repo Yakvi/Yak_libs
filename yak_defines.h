@@ -1,21 +1,33 @@
 #if !defined(YAK_DEFINES)
-// clang-format off
 
 #ifdef __cplusplus
-extern "C"
-{
+#define EXTERN_C_START \
+    extern "C"         \
+    {
+#define EXTERN_C_END }
+#else
+#define EXTERN_C_START
+#define EXTERN_C_END
 #endif
+
+EXTERN_C_START
 //
-// NOTE: Assertions
+// NOTE: Basic assertions
 //
 #ifdef DEBUG
-#define Assert(Expression) if (!(Expression)) { *(int *)0 = 0; } // Point to sector 0, immediately crash
+#define Assert(Expression) \
+    if (!(Expression)) { *(int*)0 = 0; } // Point to sector 0, immediately crash
 #else
 #define Assert(Expression)
 #endif
 
 #define InvalidCodePath Assert(!"InvalidCodePath")
-#define InvalidDefaultCase default: { InvalidCodePath; } break
+#define InvalidDefaultCase \
+    default:               \
+    {                      \
+        InvalidCodePath;   \
+    }                      \
+    break
 
 //
 // NOTE: Compilers
@@ -38,14 +50,6 @@ extern "C"
 #define COMPILER_LLVM 1
 #endif
 #endif
-
-// #if COMPILER_MSVC
-// #include <intrin.h>
-// #elif COMPILER_LLVM
-// #include <x86intrin.h>
-// #else
-// #error SEE/NEON optimizations are not available for this compiler yet!!!!
-// #endif
 
 //
 // NOTE: Types
@@ -74,6 +78,7 @@ typedef size_t memory_index;
 typedef float f32;
 typedef double f64;
 #else
+// TODO: LLVM and other compilers
 #error something
 #include <stdint.h>
 typedef int8_t s8;
@@ -96,63 +101,26 @@ typedef double f64;
 #define Gigabytes(Value) (Megabytes(Value) * 1024LL)
 #define Terabytes(Value) (Gigabytes(Value) * 1024LL)
 
-// 
+//
 // NOTE: Array Utilities
-// 
+//
+#define Pi32 3.14159265359f
+#define Tau32 6.28318530717958647692f
+
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 #define InArray(Count, Array) ((Count) < ArrayCount(Array))
 #define Min(a, b) ((a) < (b) ? (a) : (b))
 #define Max(a, b) ((a) > (b) ? (a) : (b))
 // TODO: swap, min, max ... macros?
+// #if COMPILER_MSVC
+// #include <intrin.h>
+// #elif COMPILER_LLVM
+// #include <x86intrin.h>
+// #else
+// #error SEE/NEON optimizations are not available for this compiler yet!!!!
+// #endif
 
-//
-// NOTE: Memory Utilities
-// 
-#define AlignPow2(Value, Alignment) \
-    ((Value + ((Alignment)-1)) & ~((Alignment)-1))
-#define Align4(Value) (((Value) + 3) & ~3)
-#define Align8(Value) (((Value) + 7) & ~7)
-#define Align16(Value) (((Value) + 15) & ~15)
+EXTERN_C_END
 
-#define Pi32 3.14159265359f
-#define Tau32 6.28318530717958647692f
-#define Real32Maximum FLT_MAX
-#define UIntMin 0
-#define UInt32Max 0xFFFFFFFF
-#define UInt16Max 65535
-#define Int16Min -32768
-#define Int16Max 32767
-
-inline u32
-SafeTruncateUInt64(u64 Value)
-{
-    Assert(Value <= UInt32Max);
-    u32 Result = (u32)Value;
-    return (Result);
-}
-
-inline u16
-SafeTruncateToUInt16(u32 Value)
-{
-    Assert(Value <= UInt16Max);
-    Assert(Value >= UIntMin);
-    u16 Result = (u16)Value;
-    return (Result);
-}
-
-inline s16
-SafeTruncateToInt16(s32 Value)
-{
-    Assert(Value <= Int16Max);
-    Assert(Value >= Int16Min);
-    s16 Result = (s16)Value;
-    return (Result);
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-// clang-format on
 #define YAK_DEFINES 1
 #endif

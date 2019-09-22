@@ -51,7 +51,7 @@ $c += '-DYAK_DEV=1'                    #For debug stuff
 $c += '-EHa-'                          #Disable exception handling, -EHsc for c++
 # NOTE: Debug mode
 $debug = '-DDEBUG=1', '-D_DEBUG=1'     #Basic debug defines
-$debug += '-Od'                         #Optimizations disabled
+$debug += '-Od'                        #Optimizations disabled
 $debug += '-MTd'                       #Creates debug multithreaded executable
 $debug += '-Zo'                        #Enhance Optimized Debugging
 $debug += '-Z7'                        #Generates C 7.0–compatible debugging information.
@@ -77,8 +77,8 @@ $32linker = 'user32.lib','gdi32.lib'   #Creates and manipulates the standard ele
 # $32linker += 'shell32.lib'
 
 #timeout /t 1
-# Remove-Item -LiteralPath "..\$buildDir" -Force -Recurse # NOTE: Clean build
-if(!(Test-Path -Path ..\$buildDir)) { mkdir ..\$buildDir}
+# Remove-Item -Path ..\$buildDir -Force -Recurse # NOTE: Clean build
+if(!(Test-Path -Path ..\$buildDir)) { mkdir ..\$buildDir }
 pushd ..\$buildDir
 Clear
 Write-Host "[$(Get-Date -Format $dateFormat)]: " -ForegroundColor "Yellow" -NoNewLine 
@@ -90,11 +90,11 @@ $CompileTimer = [System.Diagnostics.Stopwatch]::StartNew()
 ### BOOKMARK: Actual compiler calls
 
 # NOTE: Yak_String Tests
-$yak_string = & cl -O2 $c ..\$srcDir\yak_string_test.cpp $linker $32linker
-Output-Logs -data $yak_string -title "yak string tests"
+# $yak_string = & cl -O2 $c ..\$srcDir\yak_string_test.cpp $linker $32linker
+# Output-Logs -data $yak_string -title "yak string tests"
 # NOTE: Yak_Memory Tests
-# $yak_memory = & cl -O2 $c $debug ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
-# Output-Logs -data $yak_memory -title "yak memory tests"
+$yak_memory = & cl -O2 $c $debug ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
+Output-Logs -data $yak_memory -title "yak memory tests"
 
 # NOTE: Compiling Diagnostics
 $CompileTime = $CompileTimer.Elapsed
@@ -105,10 +105,14 @@ Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $CompileTime.seconds, $Compile
 
 ### BOOKMARK: Running tests
 # NOTE: Yak_String
+# $StringTestTimer = [System.Diagnostics.Stopwatch]::StartNew()
+# ./yak_string_test.exe
+# $StringTestTime = $StringTestTimer.Elapsed
+# Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $StringTestTime.seconds, $StringTestTime.milliseconds)) -ForegroundColor "Green"
+# NOTE: Yak_Memory
 $StringTestTimer = [System.Diagnostics.Stopwatch]::StartNew()
-./yak_string_test.exe
+./yak_memory_test.exe
 $StringTestTime = $StringTestTimer.Elapsed
 Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $StringTestTime.seconds, $StringTestTime.milliseconds)) -ForegroundColor "Green"
-# NOTE: Memory
 
 popd

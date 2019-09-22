@@ -51,7 +51,7 @@
 #endif // APIENTRY
 
 #include <windows.h>
-#include <winnt.h>
+// #include <winnt.h>
 #include <fileapi.h>   // kernel32.lib
 #include <handleapi.h> // kernel32.lib
 #include <memoryapi.h> // kernel32.lib
