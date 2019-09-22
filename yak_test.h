@@ -3,42 +3,40 @@
 ///
 /// API
 ///
-// YTestShowResults();              // Call after you define your tests.
-// YTestCleanup();                  // Call if you wish to reset your tests with new data.
-// Y_TEST_CATEGORY(Description);    Use this to split your tests into groups. Not nestable.
-// Y_ASSERT(Test, Name);            Define your tests. These are executed right away, the results are stored for later use.
+// YakTest_ShowResults();            Call after you define your tests.
+// YakTest_Cleanup();                Call if you wish to reset your tests with new data.
+// YakTest_Category(Description);    Use this to split your tests into groups. Not nestable.
+// YakTest_Assert(Test, Name);       Define your tests. These are executed right away, the results are stored for later use.
 //
 //
-
-#include <malloc.h>
 
 #define STB_SPRINTF_IMPLEMENTATION
 #define STB_SPRINTF_NOFLOAT
 #include <stb/stb_sprintf.h>
-#include <stdio.h> // TODO: Platform-specific implementations
-// TODO: Platform specific allocs
-#define ALLOC(item) (item*)malloc(sizeof(item))
-#define FREELISTITEM(item, temp) \
-    if (item)                    \
-    {                            \
-        temp = item->Next;       \
-        free(item);              \
-        item = temp;             \
+#include <stdio.h>  // TODO: Platform-specific implementations
+#include <malloc.h> // TODO: Platform specific allocs
+#define Yak_Alloc(item) (item*)malloc(sizeof(item))
+#define Yak_FreeListItem(item, temp) \
+    if (item)                        \
+    {                                \
+        temp = item->Next;           \
+        free(item);                  \
+        item = temp;                 \
     }
 
 struct condition;
 struct test;
 
-inline void GetNextTestSlot(const char* Name);
-inline void PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name);
-static condition* InitializeTestGlobals();
+inline void Yak__GetNextTestSlot(const char* Name);
+inline void Yak__PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name);
+static condition* Yak__InitializeTestGlobals();
 
-static test* GlobalFirstTestSlot;
-static test* GlobalCurrentTestSlot;
-static condition* GlobalCurrentCondition = InitializeTestGlobals();
+static test* YAK_GLOBAL__FirstTestSlot;
+static test* YAK_GLOBAL__CurrentTestSlot;
+static condition* YAK_GLOBAL__CurrentCondition = Yak__InitializeTestGlobals();
 
-#define Y_TEST_CATEGORY(Name) GetNextTestSlot(Name)
-#define Y_ASSERT(Test, Name) PopulateConditionAndAdvance(#Test, (size_t)(Test), (Name))
+#define YakTest_Category(Name) Yak__GetNextTestSlot(Name)
+#define YakTest_Assert(Test, Name) Yak__PopulateConditionAndAdvance(#Test, (size_t)(Test), (Name))
 
 //
 // BOOKMARK: IMPLEMENTATION
@@ -63,9 +61,9 @@ struct test
 };
 
 inline condition*
-GetCondition()
+Yak__GetCondition()
 {
-    condition* Result = ALLOC(condition);
+    condition* Result = Yak_Alloc(condition);
 
     Result->Next = 0;
     Result->Description = 0;
@@ -76,9 +74,9 @@ GetCondition()
 }
 
 inline test*
-GetTestSlot(const char* Name)
+Yak__GetTestSlot(const char* Name)
 {
-    test* Result = ALLOC(test);
+    test* Result = Yak_Alloc(test);
 
     Result->Description = Name;
     Result->ConditionCount = 0;
@@ -89,43 +87,43 @@ GetTestSlot(const char* Name)
 }
 
 static condition*
-InitializeTestGlobals()
+Yak__InitializeTestGlobals()
 {
-    GlobalFirstTestSlot = GlobalCurrentTestSlot = GetTestSlot(0);
-    condition *FirstCondition = GlobalFirstTestSlot->FirstCondition = GetCondition();
+    YAK_GLOBAL__FirstTestSlot = YAK_GLOBAL__CurrentTestSlot = Yak__GetTestSlot(0);
+    condition* FirstCondition = YAK_GLOBAL__FirstTestSlot->FirstCondition = Yak__GetCondition();
 
     return (FirstCondition);
 }
 
 inline void
-GetNextTestSlot(const char* Name)
+Yak__GetNextTestSlot(const char* Name)
 {
 
-    test *NextTest = GetTestSlot(Name);
-    
-    GlobalCurrentTestSlot->Next = NextTest;
-    GlobalCurrentTestSlot = GlobalCurrentTestSlot->Next;
-    
-    GlobalCurrentCondition = NextTest->FirstCondition = GetCondition();
+    test* NextTest = Yak__GetTestSlot(Name);
+
+    YAK_GLOBAL__CurrentTestSlot->Next = NextTest;
+    YAK_GLOBAL__CurrentTestSlot = YAK_GLOBAL__CurrentTestSlot->Next;
+
+    YAK_GLOBAL__CurrentCondition = NextTest->FirstCondition = Yak__GetCondition();
 }
 
 inline void
-PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name)
+Yak__PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const char* Name)
 {
-    GlobalCurrentTestSlot->ConditionCount++;
-    
-    GlobalCurrentCondition->Description = Name;
-    GlobalCurrentCondition->TestDescription = TestText;
-    GlobalCurrentCondition->Result = (unsigned)TestValue;
-    GlobalCurrentCondition->Next = GetCondition();
+    YAK_GLOBAL__CurrentTestSlot->ConditionCount++;
 
-    GlobalCurrentCondition = GlobalCurrentCondition->Next;
+    YAK_GLOBAL__CurrentCondition->Description = Name;
+    YAK_GLOBAL__CurrentCondition->TestDescription = TestText;
+    YAK_GLOBAL__CurrentCondition->Result = (unsigned)TestValue;
+    YAK_GLOBAL__CurrentCondition->Next = Yak__GetCondition();
+
+    YAK_GLOBAL__CurrentCondition = YAK_GLOBAL__CurrentCondition->Next;
 }
 
 static void
-YTestShowResults(void)
+YakTest_ShowResults(void)
 {
-    for (test* Test = GlobalFirstTestSlot;
+    for (test* Test = YAK_GLOBAL__FirstTestSlot;
          Test;
          Test = Test->Next)
     {
@@ -141,10 +139,10 @@ YTestShowResults(void)
             {
                 // TODO: Colored text
                 stbsp_sprintf(Buffer, "  - %-20s: %s\n",
-                       Condition->Description,
-                       Condition->Result ? "PASSED" : "\\\\FAILED//");
-                       //Condition->TestDescription
-                printf(Buffer);                
+                              Condition->Description,
+                              Condition->Result ? "PASSED" : "\\\\FAILED//");
+                //Condition->TestDescription
+                printf(Buffer);
             }
         }
     }
@@ -152,10 +150,10 @@ YTestShowResults(void)
 
 /** Free memory of each condition and each test */
 static void
-YTestCleanup(void)
+YakTest_Cleanup(void)
 {
     // Free tests linked list
-    test* CurrentSlot = GlobalFirstTestSlot->Next;
+    test* CurrentSlot = YAK_GLOBAL__FirstTestSlot->Next;
     test* NextSlot;
     for (;;)
     {
@@ -168,7 +166,7 @@ YTestCleanup(void)
             {
                 if (CurrentCondition)
                 {
-                    FREELISTITEM(CurrentCondition, NextCondition);
+                    Yak_FreeListItem(CurrentCondition, NextCondition);
                 }
                 else
                 {
@@ -176,7 +174,7 @@ YTestCleanup(void)
                 }
             }
 
-            FREELISTITEM(CurrentSlot, NextSlot);
+            Yak_FreeListItem(CurrentSlot, NextSlot);
         }
         else
         {
@@ -185,7 +183,7 @@ YTestCleanup(void)
     }
 
     // Reinitialize the globals
-    GlobalCurrentCondition = InitializeTestGlobals();
+    YAK_GLOBAL__CurrentCondition = Yak__InitializeTestGlobals();
 }
 
 #define YAK_TEST 1
