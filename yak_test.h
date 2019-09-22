@@ -12,14 +12,10 @@
 
 #include <malloc.h>
 
-#if 0
 #define STB_SPRINTF_IMPLEMENTATION
 #define STB_SPRINTF_NOFLOAT
 #include <stb/stb_sprintf.h>
-#else
-#include <stdio.h>
-#define stbsp_sprintf printf
-#endif
+#include <stdio.h> // TODO: Platform-specific implementations
 // TODO: Platform specific allocs
 #define ALLOC(item) (item*)malloc(sizeof(item))
 #define FREELISTITEM(item, temp) \
@@ -135,17 +131,20 @@ YTestShowResults(void)
     {
         if (Test->ConditionCount > 0)
         {
-            stbsp_sprintf("* %s\n", Test->Description ? Test->Description : "Base asserts");
+            char Buffer[200];
+            stbsp_sprintf(Buffer, "* %s\n", Test->Description ? Test->Description : "Base asserts");
+            printf(Buffer);
 
             for (condition* Condition = Test->FirstCondition;
                  Condition->Next; // we stop if we don't see a next condition, this one is empty
                  Condition = Condition->Next)
             {
                 // TODO: Colored text
-                stbsp_sprintf("  - %-20s: %s\n",
+                stbsp_sprintf(Buffer, "  - %-20s: %s\n",
                        Condition->Description,
                        Condition->Result ? "PASSED" : "\\\\FAILED//");
                        //Condition->TestDescription
+                printf(Buffer);                
             }
         }
     }

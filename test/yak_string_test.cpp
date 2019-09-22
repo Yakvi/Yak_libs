@@ -96,7 +96,6 @@ UintToChar(unsigned int Input, char* Output)
 int
 main()
 {
-#if 0
     Y_TEST_CATEGORY("Compare Strings");
     {
         Y_ASSERT(CompareStrings("A", "A"), "Equal strings return true");
@@ -111,8 +110,6 @@ main()
         Y_ASSERT(CompareStrings("0Hello", "0Hello"), "Zero doesn't mean early exit");
         Y_ASSERT(!CompareStrings("0Hello", "0Hey"), "Zero doesn't mean early exit");
     }
-#endif
-#if 1
     Y_TEST_CATEGORY("uint to char");
     {
         char Out[33] = {};
@@ -142,7 +139,6 @@ main()
         Y_ASSERT(CompareStrings(UintToChar(10506, Out), "10506"), "Pass 10506 return 10506");
         Y_ASSERT(CompareStrings(UintToChar(1, Out), "1"), "Pass 1 return 1");
     }
-#endif
 
     YTestShowResults();
     return (0);

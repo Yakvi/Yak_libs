@@ -1,5 +1,8 @@
 #if !defined(YAK_WIN32)
 
+// TODO: Printf (with colored text)
+// TODO: Diagnostics (clock cycles)
+
 #if defined _WIN32
 
 #define WIN32_LEAN_AND_MEAN
