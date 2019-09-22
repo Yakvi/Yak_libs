@@ -1,7 +1,7 @@
 #if !defined(YAK_MEMORY)
 
 #include <yak_defines.h>
-#include <yak_win32.h>
+#include <yak_platform.h>
 EXTERN_C_START
 
 //
