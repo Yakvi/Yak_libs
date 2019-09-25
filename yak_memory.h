@@ -4,6 +4,13 @@
 #include <yak_platform.h>
 EXTERN_C_START
 
+// Public API
+struct memory;
+internal memory* Yak_AllocatePlatformMemory(memory_index Size); // call this as few times as possible, ideally only to define the main memory banks at the very beginning
+#define YakMem_GetSize(MemoryBank, Size) Yak__PushMemory(MemoryBank, Size)
+
+// Internal API
+
 struct memory
 {
     memory_index Size;
@@ -11,8 +18,8 @@ struct memory
     memory_index Used;
 };
 
-memory*
-Yak_AllocatePlatformMemory(size_t Size)
+internal memory*
+Yak_AllocatePlatformMemory(memory_index Size)
 {
     memory* Result = (memory*)YakPlatform_GetMemory(Size + sizeof(memory));
     if (Result)
@@ -24,7 +31,13 @@ Yak_AllocatePlatformMemory(size_t Size)
     return (Result);
 }
 
+internal void*
+Yak__PushMemory(memory* Memory, memory_index Size)
+{
+    return Memory->Base;
+}
 
+// #define Yak_PushStruct(Name) (Name *)Yak__PushSize()
 /** TODO: 
  * ClearMemory
  * AlignMemory
