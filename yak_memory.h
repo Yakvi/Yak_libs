@@ -4,6 +4,35 @@
 #include <yak_platform.h>
 EXTERN_C_START
 
+struct memory
+{
+    memory_index Size;
+    u8* Base;
+    memory_index Used;
+};
+
+memory*
+Yak_AllocatePlatformMemory(size_t Size)
+{
+    memory* Result = (memory*)YakPlatform_GetMemory(Size + sizeof(memory));
+    if (Result)
+    {
+        Result->Size = Size; // Can write from 0 to Size - 1
+        Result->Base = (u8*)Result + sizeof(memory);
+        Result->Used = 0;
+    }
+    return (Result);
+}
+
+
+/** TODO: 
+ * ClearMemory
+ * AlignMemory
+ * GetMemory
+ * QuickGetMemory (no clear)
+ * ReturnMemory
+ **/
+
 //
 // NOTE: Memory Utilities
 //

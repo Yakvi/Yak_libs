@@ -69,15 +69,14 @@ struct file
 #define Yak_Log(Message)
 #endif // DEBUG
 
-void*
-Yak_GetMemory(size_t Size)
+inline void*
+YakPlatform_GetMemory(size_t Size)
 {
-    // TODO: allow for custom memory callbacks
     return VirtualAlloc(0, Size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 }
 
-void
-Yak_FreeMemory(void* Memory)
+inline void
+YakPlatform_FreeMemory(void* Memory)
 {
     if (Memory)
     {
@@ -87,7 +86,7 @@ Yak_FreeMemory(void* Memory)
 
 // TODO: Return by pointer? 
 file
-Yak_ReadFile(char* Filename)
+YakPlatform_ReadFile(char* Filename)
 {
     file Result = {};
 
@@ -98,7 +97,7 @@ Yak_ReadFile(char* Filename)
         if (GetFileSizeEx(FileHandle, &FileSize))
         {
             WORD FileSize32 = (WORD)FileSize.QuadPart;
-            Result.Contents = Yak_GetMemory(FileSize32);
+            Result.Contents = YakPlatform_GetMemory(FileSize32);
             if (Result.Contents)
             {
                 DWORD BytesRead;
@@ -115,7 +114,7 @@ Yak_ReadFile(char* Filename)
                     Yak_Log(Filename);
                     // Yak_Log("Error code: ");
                     // GetLastError(); // errhandlingapi.h
-                    Yak_FreeMemory(Result.Contents);
+                    YakPlatform_FreeMemory(Result.Contents);
                     Result.Contents = 0;
                 }
             }

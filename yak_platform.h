@@ -2,9 +2,10 @@
 
 // Defined platform calls
 struct file;
-void* Yak_GetMemory(size_t Size);
-void Yak_FreeMemory(void* Memory);
-file Yak_ReadFile(char* Filename);
+
+void* YakPlatform_GetMemory(size_t Size);
+void YakPlatform_FreeMemory(void* Memory);
+file YakPlatform_ReadFile(char* Filename);
 
 #ifdef _WIN32
 #include <yak_win32.h>
