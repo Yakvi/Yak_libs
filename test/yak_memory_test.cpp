@@ -1,35 +1,53 @@
+#define YAK_ENABLE_SHORTHAND_MACROS
 #include <yak_defines.h>
 #include <yak_test.h>
 #include <yak_memory.h>
+
 int
 main()
 {
-    YakTest_Category("Platform memory allocation");
+    test_cat("Platform memory allocation");
 
     int Size = 4096 - sizeof(memory); // ye standard page
     memory* MainMemory = Yak_AllocatePlatformMemory(Size);
-    YakTest_Assert(sizeof(memory) == 24, "Memory struct is 24 bytes long");
-    YakTest_Assert((MainMemory->Size == Size), "Available size equal to requested amount");
-    YakTest_Assert((MainMemory->Base[0] = 'a'), "Can write to the beginning of requested memory");
-    YakTest_Assert((MainMemory->Base[Size - 1] = 'z'), "Can write to the end of requested memory");
-    // YakTest_Assert((MainMemory->Base[Size] = 'F'), "Crash here");
+    test(sizeof(memory) == 24, "Memory struct is 24 bytes long");
+    test((MainMemory->Size == Size), "Available size equal to requested amount");
+    test((MainMemory->Vault[0] = 'a'), "Can write to the beginning of requested memory");
+    test((MainMemory->Vault[Size - 1] = 'z'), "Can write to the end of requested memory");
+    // test((MainMemory->Vault[Size] = 'F'), "Crash here");
 
-    YakTest_Category("Getting size from the bank");
+    test_cat("Getting size from the bank");
 
-    MainMemory->Size = 0; // Do not do it in real life!
+    MainMemory->Used = 0; // IMPORTANT: Do not do it in real life!
     u32* TestNumber = (u32*)YakMem_GetSize(MainMemory, sizeof(u32));
-    YakTest_Assert((u8*)TestNumber == MainMemory->Base, "Base address should be returned upon first allocation");
-    YakTest_Assert(MainMemory->Used == sizeof(u32), "Memory should be deducted from the total");
+    u32 ExpectedSize = sizeof(u32);
+
+    test((u8*)TestNumber == MainMemory->Vault, "Base address should be returned upon first allocation");
+    test(MainMemory->Used == ExpectedSize, "Memory should be deducted from the total");
+    test(*TestNumber == 0, "Memory should be cleared by default");
+
     TestNumber = (u32*)YakMem_GetSize(MainMemory, sizeof(u32));
-    YakTest_Assert((u8*)TestNumber == MainMemory->Base + sizeof(u32), "Correct address should be returned upon next allocation");
-    YakTest_Assert(MainMemory->Used == 2 * sizeof(u32), "Memory should be deducted from the total");
+    ExpectedSize += sizeof(u32);
+    test((u8*)TestNumber == MainMemory->Vault + sizeof(u32), "Correct address should be returned upon next allocation");
+    test(MainMemory->Used == ExpectedSize, "Memory should be deducted from the total");
 
-    // struct test_struct{
-    //     u32 Value;
-    // };
-    // test_struct Test = Yak_PushStruct(test_struct);
-    // YakTest_Assert(Test.Value == 0, "By default memory is zeroed out");
+    YakMem_GetSize(MainMemory, 1);
+    ExpectedSize += 4;
+    test(MainMemory->Used == ExpectedSize, "Memory is always at least 4 bytes aligned");
 
-    YakTest_ShowResults();
+    test_cat("Getting space for Struct storage");
+    struct test_struct
+    {
+        u32 Kung;
+        u8 Fu;
+    };
+    test_struct *Test = YakMem_GetStruct(MainMemory, test_struct);
+    test(Test->Kung == 0, "By default memory is zeroed out");
+    
+    ExpectedSize += 8; // u32 + u8 + 3 bytes alignment
+    test(MainMemory->Used == ExpectedSize, "Struct memory is aligned");
+    
+
+    test_output();
     return (0);
 }

@@ -3,12 +3,19 @@
 ///
 /// API
 ///
-// YakTest_ShowResults();            Call after you define your tests.
-// YakTest_Cleanup();                Call if you wish to reset your tests with new data.
 // YakTest_Category(Description);    Use this to split your tests into groups. Not nestable.
 // YakTest_Assert(Test, Name);       Define your tests. These are executed right away, the results are stored for later use.
+// YakTest_ShowResults();            Call after you define your tests.
+// YakTest_Cleanup();                Call if you wish to reset your tests with new data.
 //
-//
+// Also see shorthand versions below
+
+#ifdef YAK_ENABLE_SHORTHAND_MACROS
+#define test YakTest_Assert
+#define test_cat YakTest_Category
+#define test_clear YakTest_Cleanup
+#define test_output YakTest_ShowResults
+#endif // YAK_ENABLE_SHORTHAND_MACROS
 
 #include <yak_memory.h>
 EXTERN_C_START
