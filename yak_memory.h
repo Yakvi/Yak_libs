@@ -4,11 +4,19 @@
 #include <yak_platform.h>
 EXTERN_C_START
 
+#ifdef YAK_ENABLE_SHORTHAND_MACROS
+#define mem_reserve Yak_AllocatePlatformMemory
+#define mem_init YakMem_Init
+#define mem_size YakMem_GetSize
+#define mem_struct YakMem_GetStruct
+#endif // YAK_ENABLE_SHORTHAND_MACROS
+
 // Public API
 struct memory;
 internal memory* Yak_AllocatePlatformMemory(memory_index Size);            // Call this as few times as possible, ideally only to define the main memory banks at the very beginning
-#define YakMem_GetSize(MemoryBank, Size) Yak__PushMemory(MemoryBank, Size) // Memory is always 4 byte aligned
-#define YakMem_GetStruct(MemoryBank, Storage) (Storage *)Yak__PushMemory(MemoryBank, sizeof(Storage))
+#define YakMem_Init(Size) Yak_AllocatePlatformMemory(Size)
+#define YakMem_GetSize(MemoryBank, Size) Yak__PushMemory(Size, MemoryBank) // Memory is always 4 byte aligned
+#define YakMem_GetStruct(MemoryBank, Storage) (Storage *)YakMem_GetSize(MemoryBank, sizeof(Storage))
 
 struct memory
 {
@@ -61,7 +69,7 @@ Yak__GetEffectiveSize(memory* Memory, memory_index DesiredSize, u32 Alignment)
 }
 
 inline void*
-Yak__PushMemory(memory* Memory, memory_index Size, b32 Clear = true, u32 Alignment = 4)
+Yak__PushMemory(memory_index Size, memory* Memory, b32 Clear = true, u32 Alignment = 4)
 {
     memory_index EffectiveSize = Yak__GetEffectiveSize(Memory, Size, Alignment);
 

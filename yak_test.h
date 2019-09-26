@@ -8,7 +8,10 @@
 // YakTest_ShowResults();            Call after you define your tests.
 // YakTest_Cleanup();                Call if you wish to reset your tests with new data.
 //
-// Also see shorthand versions below
+// Also see shorthand versions below, enabled by defining YAK_ENABLE_SHORTHAND_MACROS before including this
+
+#include <yak_memory.h>
+EXTERN_C_START
 
 #ifdef YAK_ENABLE_SHORTHAND_MACROS
 #define test YakTest_Assert
@@ -17,8 +20,6 @@
 #define test_output YakTest_ShowResults
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
-#include <yak_memory.h>
-EXTERN_C_START
 #define STB_SPRINTF_IMPLEMENTATION
 #define STB_SPRINTF_NOFLOAT
 #include <stb/stb_sprintf.h>

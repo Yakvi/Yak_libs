@@ -9,7 +9,7 @@ main()
     test_cat("Platform memory allocation");
 
     int Size = 4096 - sizeof(memory); // ye standard page
-    memory* MainMemory = Yak_AllocatePlatformMemory(Size);
+    memory *MainMemory = mem_init(Size);
     test(sizeof(memory) == 24, "Memory struct is 24 bytes long");
     test((MainMemory->Size == Size), "Available size equal to requested amount");
     test((MainMemory->Vault[0] = 'a'), "Can write to the beginning of requested memory");
