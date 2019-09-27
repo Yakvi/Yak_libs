@@ -6,11 +6,21 @@
 int
 main(void)
 {
-    LPSTR lpszPrompt1 = "Hello world \n";
+    f32 ClockFreq = Yak__GetClockFrequency();
+
+    LPSTR Prompt1 = "Hello world \n";
     
     HANDLE OutHandle = Yak__ConsoleInit();
-    Yak__Print(lpszPrompt1, lstrlenA(lpszPrompt1), OutHandle);
-    Yak__Print(lpszPrompt1, lstrlenA(lpszPrompt1), OutHandle, ConsoleColor_Yellow);
+    
+    LARGE_INTEGER ClockStart = Yak__GetWallClock();
+    Yak__Print(Prompt1, lstrlenA(Prompt1), OutHandle);
+    f32 SecondsElapsed = Yak__GetSecondsElapsed(ClockStart, ClockFreq);
+    
+    ClockStart = Yak__GetWallClock();
+    printf(Prompt1);
+    SecondsElapsed = Yak__GetSecondsElapsed(ClockStart, ClockFreq);
+
+    Yak__Print(Prompt1, lstrlenA(Prompt1), OutHandle, ConsoleColor_Yellow);
 
     test_output();
     return (0);

@@ -65,8 +65,12 @@ struct file
 #ifdef DEBUG
 #include <debugapi.h>
 #define Yak_Log(Message) OutputDebugStringA(Message)
+#define Yak_TimerStart()
+#define Yak_TimerEnd(ClockStart)
 #else
 #define Yak_Log(Message)
+#define Yak_TimerStart()
+#define Yak_TimerEnd(ClockStart)
 #endif // DEBUG
 
 inline void*
@@ -170,7 +174,7 @@ Yak__ConsoleInit()
     {
         Yak_Log("Error during console handle initialization");
     }
-    return(Result);
+    return (Result);
 }
 
 inline void
@@ -224,6 +228,35 @@ Yak__NewLine(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
     {
         Yak_Log("NewLine error: SetConsoleCursorPosition");
     }
+}
+
+//
+// BOOKMARK: Debug tools
+//
+
+inline float
+Yak__GetClockFrequency()
+{
+    LARGE_INTEGER PerfCountFrequencyResult;
+    QueryPerformanceFrequency(&PerfCountFrequencyResult);
+    float Result = (float)PerfCountFrequencyResult.QuadPart;
+    return (Result);
+}
+
+inline LARGE_INTEGER
+Yak__GetWallClock()
+{
+    LARGE_INTEGER Result;
+    QueryPerformanceCounter(&Result);
+    return (Result);
+}
+
+inline float
+Yak__GetSecondsElapsed(LARGE_INTEGER Start, float PerfCountFrequency)
+{
+    LARGE_INTEGER End = Yak__GetWallClock();
+    float Result = ((float)(End.QuadPart - Start.QuadPart) / PerfCountFrequency);
+    return (Result);
 }
 
 #undef WIN32_LEAN_AND_MEAN
