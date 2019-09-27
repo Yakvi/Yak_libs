@@ -9,14 +9,16 @@ EXTERN_C_START
 #define mem_init YakMem_Init
 #define mem_size YakMem_GetSize
 #define mem_struct YakMem_GetStruct
+#define mem_reset YakMem_Reset
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
 // Public API
 struct memory;
-internal memory* Yak_AllocatePlatformMemory(memory_index Size);            // Call this as few times as possible, ideally only to define the main memory banks at the very beginning
+internal memory* Yak_AllocatePlatformMemory(memory_index Size); // Call this as few times as possible, ideally only to define the main memory banks at the very beginning
 #define YakMem_Init(Size) Yak_AllocatePlatformMemory(Size)
-#define YakMem_GetSize(MemoryBank, Size) Yak__PushMemory(Size, MemoryBank) // Memory is always 4 byte aligned
-#define YakMem_GetStruct(MemoryBank, Storage) (Storage *)YakMem_GetSize(MemoryBank, sizeof(Storage))
+#define YakMem_GetSize(MemoryBank, Size, ...) Yak__PushMemory(Size, MemoryBank, ##__VA_ARGS__) // Memory is always 4 byte aligned
+#define YakMem_GetStruct(MemoryBank, Storage, ...) (Storage*)YakMem_GetSize(MemoryBank, sizeof(Storage), ##__VA_ARGS__)
+#define YakMem_Reset(MemoryBank, ...) Yak__ResetMemory(MemoryBank, ##__VA_ARGS__)
 
 struct memory
 {
@@ -25,26 +27,31 @@ struct memory
     memory_index Used;
 };
 
-internal memory*
-Yak_AllocatePlatformMemory(memory_index Size)
+enum memory_flags
 {
-    memory* Result = (memory*)YakPlatform_GetMemory(Size + sizeof(memory));
-    if (Result)
-    {
-        Result->Size = Size; // Can write from 0 to Size - 1
-        Result->Vault = (u8*)Result + sizeof(memory);
-        Result->Used = 0;
-    }
-    return (Result);
-}
+    MemoryFlag_Clear = 0b1,
+    MemoryFlag_NoClear = 0b10,
+};
 
 inline void
 Yak__ClearMemory(void* Memory, memory_index Size)
 {
+    // TODO: since we always align by 4 by default, can clear by u32s?
     for (memory_index Index = 0; Index < Size; ++Index)
     {
         ((u8*)Memory)[Index] = 0;
     }
+}
+
+inline void
+Yak__ResetMemory(memory* Memory, memory_index Size = 0)
+{
+    Assert(Memory);
+    if (Size)
+    {
+        Memory->Size = Size; // Can write from 0 to Size - 1
+    }
+    Memory->Used = 0;
 }
 
 inline memory_index
@@ -56,7 +63,7 @@ Yak__GetEffectiveSize(memory* Memory, memory_index DesiredSize, u32 Alignment)
 
     memory_index CurrentBlock = (memory_index)Memory->Vault + Memory->Used + DesiredSize;
     memory_index AlignmentMask = Alignment - 1;
-    
+
     memory_index Offset = 0;
     if (CurrentBlock & AlignmentMask)
     {
@@ -69,31 +76,42 @@ Yak__GetEffectiveSize(memory* Memory, memory_index DesiredSize, u32 Alignment)
 }
 
 inline void*
-Yak__PushMemory(memory_index Size, memory* Memory, b32 Clear = true, u32 Alignment = 4)
+Yak__PushMemory(memory_index SizeInit, memory* Memory, u32 Flags = MemoryFlag_Clear, u32 Alignment = 4)
 {
-    memory_index EffectiveSize = Yak__GetEffectiveSize(Memory, Size, Alignment);
-
-    Assert(Memory->Size >= Memory->Used + EffectiveSize);
-
     void* Result = Memory->Vault + Memory->Used;
-    Memory->Used += EffectiveSize;
 
+    memory_index Size = Yak__GetEffectiveSize(Memory, SizeInit, Alignment);
+
+    Assert(Memory->Size >= Memory->Used + Size);
+    Memory->Used += Size;
     Assert(Memory->Size >= Memory->Used);
 
-    if (Clear)
+    if (Flags & MemoryFlag_Clear)
     {
-        Yak__ClearMemory(Result, EffectiveSize);
+        Yak__ClearMemory(Result, Size);
     }
 
     return Result;
 }
 
-// #define Yak_PushStruct(Name) (Name *)Yak__PushSize()
+//
+// Platform interaction
+//
+
+internal memory*
+Yak_AllocatePlatformMemory(memory_index Size)
+{
+    memory* Result = (memory*)YakPlatform_GetMemory(Size + sizeof(memory));
+    if (Result)
+    {
+        Result->Vault = (u8*)Result + sizeof(memory);
+        YakMem_Reset(Result, Size);
+    }
+
+    return (Result);
+}
 /** TODO: 
- * ClearMemory
- * AlignMemory
- * QuickGetMemory (no clear)
- * ReturnMemory
+ * FreePlatformMemory
  **/
 
 //
