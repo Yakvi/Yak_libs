@@ -93,8 +93,11 @@ $CompileTimer = [System.Diagnostics.Stopwatch]::StartNew()
 # $yak_string = & cl -O2 $c ..\$srcDir\yak_string_test.cpp $linker $32linker
 # Output-Logs -data $yak_string -title "yak string tests"
 # NOTE: Yak_Memory Tests
-$yak_memory = & cl -O2 $c $debug ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
-Output-Logs -data $yak_memory -title "yak memory tests"
+# $yak_memory = & cl -O2 $c ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
+# Output-Logs -data $yak_memory -title "yak memory tests"
+# NOTE: Yak_Win32 Tests
+$yak_win32 = & cl -O2 $c $debug ..\$srcDir\yak_win32_test.cpp -Fmyak_win32_test $linker $32linker
+Output-Logs -data $yak_win32 -title "yak Win32 tests"
 
 # NOTE: Compiling Diagnostics
 $CompileTime = $CompileTimer.Elapsed
@@ -104,15 +107,16 @@ Write-Host "Compilation finished in " -ForegroundColor "Cyan" -NoNewLine
 Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $CompileTime.seconds, $CompileTime.milliseconds)) -ForegroundColor "Green"
 
 ### BOOKMARK: Running tests
-# NOTE: Yak_String
-# $StringTestTimer = [System.Diagnostics.Stopwatch]::StartNew()
-# ./yak_string_test.exe
-# $StringTestTime = $StringTestTimer.Elapsed
-# Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $StringTestTime.seconds, $StringTestTime.milliseconds)) -ForegroundColor "Green"
-# NOTE: Yak_Memory
-$StringTestTimer = [System.Diagnostics.Stopwatch]::StartNew()
-./yak_memory_test.exe
-$StringTestTime = $StringTestTimer.Elapsed
-Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $StringTestTime.seconds, $StringTestTime.milliseconds)) -ForegroundColor "Green"
+function Run-Command([String]$Command)
+{
+    $Timer = [System.Diagnostics.Stopwatch]::StartNew()
+    & $Command
+    $ElapsedTime = $Timer.Elapsed
+    Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $ElapsedTime.seconds, $ElapsedTime.milliseconds)) -ForegroundColor "Green"
+
+}
+# Run-Command ./yak_string_test.exe
+# Run-Command ./yak_memory_test.exe
+Run-Command ./yak_win32_test.exe
 
 popd

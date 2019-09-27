@@ -25,13 +25,13 @@
 #define NODRAWTEXT
 #define NOGDI
 #define NOKERNEL
-#define NOUSER
+// #define NOUSER
 #define NONLS
-#define NOMB
+// #define NOMB
 #define NOMEMMGR
 #define NOMETAFILE
 #define NOMINMAX
-#define NOMSG
+// #define NOMSG
 #define NOOPENFILE
 #define NOSCROLL
 #define NOSERVICE
@@ -84,7 +84,7 @@ YakPlatform_FreeMemory(void* Memory)
     }
 }
 
-// TODO: Return by pointer? 
+// TODO: Return by pointer?
 file
 YakPlatform_ReadFile(char* Filename)
 {
@@ -97,7 +97,7 @@ YakPlatform_ReadFile(char* Filename)
         if (GetFileSizeEx(FileHandle, &FileSize))
         {
             WORD FileSize32 = (WORD)FileSize.QuadPart;
-            Result.Contents = YakPlatform_GetMemory(FileSize32);
+            Result.Contents = YakPlatform_GetMemory(FileSize32); // TODO: involve memory here
             if (Result.Contents)
             {
                 DWORD BytesRead;
@@ -145,6 +145,85 @@ YakPlatform_ReadFile(char* Filename)
     }
 
     return (Result);
+}
+
+//
+// BOOKMARK: Console utilities
+//
+
+enum ConsoleColor
+{
+    ConsoleColor_Red = FOREGROUND_RED | FOREGROUND_INTENSITY,
+    ConsoleColor_Green = FOREGROUND_GREEN | FOREGROUND_INTENSITY,
+    ConsoleColor_Blue = FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    ConsoleColor_Yellow = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY,
+    ConsoleColor_Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    ConsoleColor_Cyan = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    ConsoleColor_White = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY,
+};
+
+inline HANDLE
+Yak__ConsoleInit()
+{
+    HANDLE Result = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (Result == INVALID_HANDLE_VALUE)
+    {
+        Yak_Log("Error during console handle initialization");
+    }
+    return(Result);
+}
+
+inline void
+Yak__Print(char* String, u32 Length, HANDLE OutHandle, WORD Color = ConsoleColor_White)
+{
+    if (SetConsoleTextAttribute(OutHandle, Color))
+    {
+        if (!WriteConsoleA(OutHandle, String, Length, 0, 0))
+        {
+            Yak_Log("Error while writing to console");
+        }
+    }
+    else
+    {
+        Yak_Log("Error setting text color");
+    }
+}
+
+// These two are only needed if the console mode has disabled line input mode.
+// (OldMode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT))
+inline void
+Yak__ScrollScreenBuffer(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
+{
+    SMALL_RECT srctScrollRect = {};
+
+    srctScrollRect.Top = 1;
+    srctScrollRect.Right = ScreenBuffer->dwSize.X - 1;
+    srctScrollRect.Bottom = ScreenBuffer->dwSize.Y - 1;
+
+    COORD Dest = {};
+    CHAR_INFO Fill = {};
+
+    ScrollConsoleScreenBuffer(OutHandle, &srctScrollRect, 0, Dest, &Fill);
+}
+
+inline void
+Yak__NewLine(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
+{
+    ScreenBuffer->dwCursorPosition.X = 0;
+
+    if (ScreenBuffer->dwCursorPosition.Y == (ScreenBuffer->dwSize.Y - 1))
+    {
+        Yak__ScrollScreenBuffer(OutHandle, ScreenBuffer);
+    }
+    else
+    {
+        ScreenBuffer->dwCursorPosition.Y += 1;
+    }
+
+    if (!SetConsoleCursorPosition(OutHandle, ScreenBuffer->dwCursorPosition))
+    {
+        Yak_Log("NewLine error: SetConsoleCursorPosition");
+    }
 }
 
 #undef WIN32_LEAN_AND_MEAN
