@@ -69,9 +69,9 @@ struct platform
     HANDLE ConsoleOutHandle;
 };
 
-struct timer
+struct clock
 {
-    long long Snapshot;
+    long long Time;
 };
 
 #ifdef DEBUG
@@ -263,23 +263,23 @@ YakWin32__GetClockFrequency(void)
     return (Result);
 }
 
-inline timer
+inline clock
 YakPlatform_GetTime(void)
 {
-    timer Result = {};
+    clock Result = {};
 
     LARGE_INTEGER Clock;
     QueryPerformanceCounter(&Clock);
 
-    Result.Snapshot = Clock.QuadPart;
+    Result.Time = Clock.QuadPart;
     return Result;
 }
 
 inline float
-YakPlatform_StopTimer(timer Start, platform Platform)
+YakPlatform_StopTimer(clock Start, platform Platform)
 {
-    timer End = YakPlatform_GetTime();
-    float Result = ((float)(End.Snapshot - Start.Snapshot) /
+    clock End = YakPlatform_GetTime();
+    float Result = ((float)(End.Time - Start.Time) /
                     Platform.ClockFrequency);
     return (Result);
 }

@@ -3,7 +3,7 @@
 // PLATFORM API
 struct file;
 struct platform;
-struct timer;
+struct clock;
 
 static platform YakPlatform_Init(void);
 
@@ -12,8 +12,8 @@ static void YakPlatform_FreeMemory(void*);
 static file YakPlatform_ReadFile(char*);
 
 inline void YakPlatform_OutputConsole(char*, unsigned, platform*, unsigned short);
-inline timer YakPlatform_GetTime(void);
-inline float YakPlatform_StopTimer(timer, platform*);
+inline clock YakPlatform_GetTime(void);
+inline float YakPlatform_StopTimer(clock, platform*);
 
 #ifdef _WIN32
 #include <yak_win32.h>

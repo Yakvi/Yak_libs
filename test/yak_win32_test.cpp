@@ -11,7 +11,7 @@ main(void)
     LPSTR Prompt1 = "Hello world \n";
     
     
-    timer ClockStart = YakPlatform_GetTime();
+    clock ClockStart = YakPlatform_GetTime();
     YakPlatform_OutputConsole(Prompt1, lstrlenA(Prompt1), PlatformData);
     f32 SecondsElapsed = YakPlatform_StopTimer(ClockStart, PlatformData);
     
