@@ -2,7 +2,7 @@
 
 //
 // NOTE: String utlities
-// 
+//
 typedef char const* str; // TODO: what happens to it in memory? Possible leaks?
 
 bool
@@ -98,23 +98,38 @@ Yak_UintToChar(unsigned int Input, char* Output)
     return (Output);
 }
 
+char*
+Yak_IntToChar(int Input, char* Output)
+{
+    int Depth = 0;
+    if (Input < 0)
+    {
+        Output[Depth++] = '-';
+    }
+    
+    Yak__UintToCharRecursive(Input, Output, Depth);
+    Output[Depth + 1] = 0;
+
+    return (Output);
+}
+
 inline bool
-Yak_FillBuffer(char* Source, char *Dest, size_t MaxLength)
+Yak_FillBuffer(char* Source, char* Dest, size_t MaxLength)
 {
     bool Result = true;
     size_t BufferIndex = 0;
-    char *At = Source;
-    while(At)
+    char* At = Source;
+    while (At)
     {
         Dest[BufferIndex++] = *At++;
-        if(BufferIndex >= MaxLength)
+        if (BufferIndex >= MaxLength)
         {
             Result = false;
             break;
         }
     }
-    
-    return(Result);
+
+    return (Result);
 }
 
 #define YAK_STRING
