@@ -69,6 +69,11 @@ struct platform
     HANDLE ConsoleOutHandle;
 };
 
+struct timer
+{
+    long long Snapshot;
+};
+
 #ifdef DEBUG
 #include <debugapi.h>
 #define Yak_Log(Message) OutputDebugStringA(Message)
@@ -79,6 +84,10 @@ struct platform
 #define Yak_TimerStart()
 #define Yak_TimerEnd(ClockStart)
 #endif // DEBUG
+
+//
+// BOOKMARK: Memory
+//
 
 static void*
 YakPlatform_GetMemory(size_t Size)
@@ -94,6 +103,10 @@ YakPlatform_FreeMemory(void* Memory)
         VirtualFree(Memory, 0, MEM_RELEASE);
     }
 }
+
+//
+// BOOKMARK: File i/o
+//
 
 // TODO: Return by pointer?
 static file
@@ -159,7 +172,7 @@ YakPlatform_ReadFile(char* Filename)
 }
 
 //
-// BOOKMARK: Console utilities
+// BOOKMARK: Console i/o
 //
 
 enum ConsoleColor
@@ -185,11 +198,11 @@ YakWin32__GetConsoleHandle(unsigned int HandleType)
 }
 
 inline void
-YakPlatform_OutputConsole(char* String, u32 Length, platform* Platform, WORD Color = ConsoleColor_White)
+YakPlatform_OutputConsole(char* String, u32 Length, platform Platform, WORD Color = ConsoleColor_White)
 {
-    if (SetConsoleTextAttribute(Platform->ConsoleOutHandle, Color))
+    if (SetConsoleTextAttribute(Platform.ConsoleOutHandle, Color))
     {
-        if (!WriteConsoleA(Platform->ConsoleOutHandle, String, Length, 0, 0))
+        if (!WriteConsoleA(Platform.ConsoleOutHandle, String, Length, 0, 0))
         {
             Yak_Log("Error while writing to console");
         }
@@ -242,7 +255,7 @@ Yak__NewLine(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
 //
 
 inline float
-YakWin32__GetClockFrequency()
+YakWin32__GetClockFrequency(void)
 {
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceFrequency(&PerfCountFrequencyResult);
@@ -250,19 +263,24 @@ YakWin32__GetClockFrequency()
     return (Result);
 }
 
-inline long long
-YakPlatform_StartTimer()
+inline timer
+YakPlatform_GetTime(void)
 {
-    LARGE_INTEGER Result;
-    QueryPerformanceCounter(&Result);
-    return Result.QuadPart;
+    timer Result = {};
+
+    LARGE_INTEGER Clock;
+    QueryPerformanceCounter(&Clock);
+
+    Result.Snapshot = Clock.QuadPart;
+    return Result;
 }
 
 inline float
-YakPlatform_EndTimer(long long Start, platform* Platform)
+YakPlatform_StopTimer(timer Start, platform Platform)
 {
-    long long End = YakPlatform_StartTimer();
-    float Result = ((float)(End - Start) / Platform->ClockFrequency);
+    timer End = YakPlatform_GetTime();
+    float Result = ((float)(End.Snapshot - Start.Snapshot) /
+                    Platform.ClockFrequency);
     return (Result);
 }
 
@@ -270,14 +288,13 @@ YakPlatform_EndTimer(long long Start, platform* Platform)
 // Platform Initializer
 //
 
-static platform*
-YakPlatform_Init()
+static platform
+YakPlatform_Init(void)
 {
-    platform* Platform = (platform*)YakPlatform_GetMemory(sizeof(platform));
-    Platform->ClockFrequency = YakWin32__GetClockFrequency();
-    Platform->ConsoleOutHandle = YakWin32__GetConsoleHandle(STD_OUTPUT_HANDLE);
-    Platform->IsInitialized = true;
-
+    platform Platform = {};
+    Platform.ClockFrequency = YakWin32__GetClockFrequency();
+    Platform.ConsoleOutHandle = YakWin32__GetConsoleHandle(STD_OUTPUT_HANDLE);
+    Platform.IsInitialized = true;
     return (Platform);
 }
 
