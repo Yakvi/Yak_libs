@@ -6,21 +6,20 @@
 int
 main(void)
 {
-    f32 ClockFreq = Yak__GetClockFrequency();
+    platform * PlatformData = YakPlatform_Init();
 
     LPSTR Prompt1 = "Hello world \n";
     
-    HANDLE OutHandle = Yak__ConsoleInit();
     
-    LARGE_INTEGER ClockStart = Yak__GetWallClock();
-    Yak__Print(Prompt1, lstrlenA(Prompt1), OutHandle);
-    f32 SecondsElapsed = Yak__GetSecondsElapsed(ClockStart, ClockFreq);
+    u64 ClockStart = YakPlatform_StartTimer();
+    YakPlatform_OutputConsole(Prompt1, lstrlenA(Prompt1), PlatformData);
+    f32 SecondsElapsed = YakPlatform_EndTimer(ClockStart, PlatformData);
     
-    ClockStart = Yak__GetWallClock();
+    ClockStart = YakPlatform_StartTimer();
     printf(Prompt1);
-    SecondsElapsed = Yak__GetSecondsElapsed(ClockStart, ClockFreq);
+    SecondsElapsed = YakPlatform_EndTimer(ClockStart, PlatformData);
 
-    Yak__Print(Prompt1, lstrlenA(Prompt1), OutHandle, ConsoleColor_Yellow);
+    YakPlatform_OutputConsole(Prompt1, lstrlenA(Prompt1), PlatformData, ConsoleColor_Yellow);
 
     test_output();
     return (0);

@@ -62,6 +62,13 @@ struct file
     void* Contents;
 };
 
+struct platform
+{
+    bool IsInitialized;
+    float ClockFrequency;
+    HANDLE ConsoleOutHandle;
+};
+
 #ifdef DEBUG
 #include <debugapi.h>
 #define Yak_Log(Message) OutputDebugStringA(Message)
@@ -73,13 +80,13 @@ struct file
 #define Yak_TimerEnd(ClockStart)
 #endif // DEBUG
 
-inline void*
+static void*
 YakPlatform_GetMemory(size_t Size)
 {
     return VirtualAlloc(0, Size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 }
 
-inline void
+static void
 YakPlatform_FreeMemory(void* Memory)
 {
     if (Memory)
@@ -89,7 +96,7 @@ YakPlatform_FreeMemory(void* Memory)
 }
 
 // TODO: Return by pointer?
-file
+static file
 YakPlatform_ReadFile(char* Filename)
 {
     file Result = {};
@@ -157,19 +164,19 @@ YakPlatform_ReadFile(char* Filename)
 
 enum ConsoleColor
 {
-    ConsoleColor_Red = FOREGROUND_RED | FOREGROUND_INTENSITY,
-    ConsoleColor_Green = FOREGROUND_GREEN | FOREGROUND_INTENSITY,
     ConsoleColor_Blue = FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-    ConsoleColor_Yellow = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY,
-    ConsoleColor_Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    ConsoleColor_Green = FOREGROUND_GREEN | FOREGROUND_INTENSITY,
+    ConsoleColor_Red = FOREGROUND_RED | FOREGROUND_INTENSITY,
     ConsoleColor_Cyan = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    ConsoleColor_Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    ConsoleColor_Yellow = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY,
     ConsoleColor_White = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY,
 };
 
 inline HANDLE
-Yak__ConsoleInit()
+YakWin32__GetConsoleHandle(unsigned int HandleType)
 {
-    HANDLE Result = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE Result = GetStdHandle(HandleType);
     if (Result == INVALID_HANDLE_VALUE)
     {
         Yak_Log("Error during console handle initialization");
@@ -178,11 +185,11 @@ Yak__ConsoleInit()
 }
 
 inline void
-Yak__Print(char* String, u32 Length, HANDLE OutHandle, WORD Color = ConsoleColor_White)
+YakPlatform_OutputConsole(char* String, u32 Length, platform* Platform, WORD Color = ConsoleColor_White)
 {
-    if (SetConsoleTextAttribute(OutHandle, Color))
+    if (SetConsoleTextAttribute(Platform->ConsoleOutHandle, Color))
     {
-        if (!WriteConsoleA(OutHandle, String, Length, 0, 0))
+        if (!WriteConsoleA(Platform->ConsoleOutHandle, String, Length, 0, 0))
         {
             Yak_Log("Error while writing to console");
         }
@@ -231,11 +238,11 @@ Yak__NewLine(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
 }
 
 //
-// BOOKMARK: Debug tools
+// BOOKMARK: Clock
 //
 
 inline float
-Yak__GetClockFrequency()
+YakWin32__GetClockFrequency()
 {
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceFrequency(&PerfCountFrequencyResult);
@@ -243,20 +250,35 @@ Yak__GetClockFrequency()
     return (Result);
 }
 
-inline LARGE_INTEGER
-Yak__GetWallClock()
+inline long long
+YakPlatform_StartTimer()
 {
     LARGE_INTEGER Result;
     QueryPerformanceCounter(&Result);
-    return (Result);
+    return Result.QuadPart;
 }
 
 inline float
-Yak__GetSecondsElapsed(LARGE_INTEGER Start, float PerfCountFrequency)
+YakPlatform_EndTimer(long long Start, platform* Platform)
 {
-    LARGE_INTEGER End = Yak__GetWallClock();
-    float Result = ((float)(End.QuadPart - Start.QuadPart) / PerfCountFrequency);
+    long long End = YakPlatform_StartTimer();
+    float Result = ((float)(End - Start) / Platform->ClockFrequency);
     return (Result);
+}
+
+//
+// Platform Initializer
+//
+
+static platform*
+YakPlatform_Init()
+{
+    platform* Platform = (platform*)YakPlatform_GetMemory(sizeof(platform));
+    Platform->ClockFrequency = YakWin32__GetClockFrequency();
+    Platform->ConsoleOutHandle = YakWin32__GetConsoleHandle(STD_OUTPUT_HANDLE);
+    Platform->IsInitialized = true;
+
+    return (Platform);
 }
 
 #undef WIN32_LEAN_AND_MEAN
