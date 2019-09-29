@@ -10,7 +10,6 @@
 //
 // Also see shorthand versions below, enabled by defining YAK_ENABLE_SHORTHAND_MACROS before including this
 
-#include <yak_memory.h>
 EXTERN_C_START
 
 #ifdef YAK_ENABLE_SHORTHAND_MACROS
@@ -20,11 +19,8 @@ EXTERN_C_START
 #define test_output YakTest_ShowResults
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
-#define STB_SPRINTF_IMPLEMENTATION
-#define STB_SPRINTF_NOFLOAT
-#include <stb/stb_sprintf.h>
-#include <stdio.h>  // TODO: Platform-specific implementations
-#include <malloc.h> // TODO: Platform specific allocs
+#include <stdio.h> 
+#include <malloc.h> // TODO: Too many mallocs
 #define Yak_Alloc(item) (item*)malloc(sizeof(item))
 #define Yak_FreeListItem(item, temp) \
     if (item)                        \
@@ -108,7 +104,6 @@ Yak__InitializeTestGlobals()
 inline void
 Yak__GetNextTestSlot(const char* Name)
 {
-
     test* NextTest = Yak__GetTestSlot(Name);
 
     YAK_GLOBAL__CurrentTestSlot->Next = NextTest;
@@ -130,33 +125,6 @@ Yak__PopulateConditionAndAdvance(const char* TestText, size_t TestValue, const c
     YAK_GLOBAL__CurrentCondition = YAK_GLOBAL__CurrentCondition->Next;
 }
 
-static void
-YakTest_ShowResults(void)
-{
-    for (test* Test = YAK_GLOBAL__FirstTestSlot;
-         Test;
-         Test = Test->Next)
-    {
-        if (Test->ConditionCount > 0)
-        {
-            char Buffer[200];
-            stbsp_sprintf(Buffer, "* %s\n", Test->Description ? Test->Description : "Base asserts");
-            printf(Buffer);
-
-            for (condition* Condition = Test->FirstCondition;
-                 Condition->Next; // we stop if we don't see a next condition, this one is empty
-                 Condition = Condition->Next)
-            {
-                // TODO: Colored text
-                stbsp_sprintf(Buffer, "  - %-20s: %s\n",
-                              Condition->Description,
-                              Condition->Result ? "PASSED" : "\\\\FAILED//");
-                //Condition->TestDescription
-                printf(Buffer);
-            }
-        }
-    }
-}
 
 /** Free memory of each condition and each test */
 static void
@@ -195,6 +163,44 @@ YakTest_Cleanup(void)
     // Reinitialize the globals
     YAK_GLOBAL__CurrentCondition = Yak__InitializeTestGlobals();
 }
+
+static void
+YakTest_ShowResults(void)
+{
+    for (test* Test = YAK_GLOBAL__FirstTestSlot;
+         Test;
+         Test = Test->Next)
+    {
+        if (Test->ConditionCount > 0)
+        {
+            printf(" * %s:\n", Test->Description ? Test->Description : "Base asserts");
+
+            for (condition* Condition = Test->FirstCondition;
+                 Condition->Next; // we stop if we don't see a next condition, this one is empty
+                 Condition = Condition->Next)
+            {
+                printf("[");
+                // NOTE: Colored text
+                if (Condition->Result)
+                {
+                    printf("\033[0;32m");
+                    printf("PASS");
+                }
+                else
+                {
+                    printf("\033[1;31m");
+                    printf("FAIL");
+                }
+                printf("\033[0m");
+
+                printf("]: %s\n", Condition->Description);
+            }
+        }
+    }
+
+    YakTest_Cleanup(); // Free memory // TODO: Do I need to call it each time I call results?
+}
+
 EXTERN_C_END
 #define YAK_TEST 1
 #endif // !(YAK_TEST)

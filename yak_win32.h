@@ -56,23 +56,23 @@
 #include <handleapi.h> // kernel32.lib
 #include <memoryapi.h> // kernel32.lib
 
-struct file
+typedef struct file
 {
     unsigned int Size;
     void* Contents;
-};
+} file;
 
-struct platform
+typedef struct platform
 {
     bool IsInitialized;
     float ClockFrequency;
     HANDLE ConsoleOutHandle;
-};
+} platform;
 
-struct clock
+typedef struct clock
 {
     long long Time;
-};
+} clock;
 
 #ifdef DEBUG
 #include <debugapi.h>
