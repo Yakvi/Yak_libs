@@ -12,15 +12,15 @@ struct file;
 struct platform;
 struct clock;
 
-static platform YakPlatform_Init(void);
+static platform YakPlatform_Init();
 
-static void* YakPlatform_GetMemory(size_t);
-static void YakPlatform_FreeMemory(void*);
-static file YakPlatform_ReadFile(char*);
+static void* YakPlatform_GetMemory();
+static void YakPlatform_FreeMemory();
+static file YakPlatform_ReadFile();
 
-inline void YakPlatform_OutputConsole(char*, unsigned, platform*, unsigned short);
-inline clock YakPlatform_GetClock(void);
-inline float YakPlatform_MeasureTime(clock, platform*);
+inline void YakPlatform_OutputConsole();
+inline clock YakPlatform_GetClock();
+inline float YakPlatform_MeasureTime();
 
 #ifdef _WIN32
 #include <yak_win32.h>

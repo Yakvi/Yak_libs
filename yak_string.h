@@ -1,12 +1,29 @@
 #if !defined(YAK_STRING)
 
+#include <yak_defines.h>
+#include <yak_memory.h>
 EXTERN_C_START
 
-typedef struct string {
+/**
+ * Requirements
+ 
+* API
+* In: Memory
+* Out: n/a
+* */
 
+typedef struct string
+{
+    size_t Length;
+    union
+    {
+        wchar_t* Wide;
+        char* Char;
+        void* Raw;
+    };
 } string;
 
-bool
+inline bool
 Yak_StrCmp(char* A, char* B)
 {
     bool Result = false;
@@ -73,7 +90,7 @@ Yak_StrCmp(char* A, char* B)
 // #define BYTE_TOP_BIT_MASK 0b100
 // #define BYTE_MASK 0xF
 
-char*
+inline char*
 Yak__UintToCharRecursive(unsigned int Input, char* Output, int& Depth)
 {
     int Value = Input;
@@ -89,7 +106,7 @@ Yak__UintToCharRecursive(unsigned int Input, char* Output, int& Depth)
     return (Output);
 }
 
-char*
+inline char*
 Yak_UintToChar(unsigned int Input, char* Output)
 {
     int Depth = 0;
@@ -99,7 +116,7 @@ Yak_UintToChar(unsigned int Input, char* Output)
     return (Output);
 }
 
-char*
+inline char*
 Yak_IntToChar(int Input, char* Output)
 {
     int Depth = 0;
@@ -107,7 +124,7 @@ Yak_IntToChar(int Input, char* Output)
     {
         Output[Depth++] = '-';
     }
-    
+
     Yak__UintToCharRecursive(Input, Output, Depth);
     Output[Depth + 1] = 0;
 
@@ -132,6 +149,7 @@ Yak_FillBuffer(char* Source, char* Dest, size_t MaxLength)
 
     return (Result);
 }
+
 EXTERN_C_END
 
 #define YAK_STRING

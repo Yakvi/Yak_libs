@@ -8,7 +8,7 @@ main(void)
 {
     platform PlatformData = YakPlatform_Init();
 
-    LPSTR Prompt1 = "Hello world \n";
+    LPSTR Prompt1 = "Color tests \n";
     
     clock ClockStart = YakPlatform_GetClock();
     YakPlatform_OutputConsole(Prompt1, lstrlenA(Prompt1), PlatformData);
@@ -26,6 +26,7 @@ main(void)
     YakPlatform_OutputConsole("Magenta ", lstrlenA("Magenta "), PlatformData, ConsoleColor_Magenta);
     YakPlatform_OutputConsole("White\n", lstrlenA("White\n"), PlatformData, ConsoleColor_White);
 
+    test(true, "This succeeds");
     test(false, "This fails");
     test_output();
     return (0);

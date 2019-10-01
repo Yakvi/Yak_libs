@@ -10,7 +10,10 @@
 //
 // Also see shorthand versions below, enabled by defining YAK_ENABLE_SHORTHAND_MACROS before including this
 
-EXTERN_C_START
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #ifdef YAK_ENABLE_SHORTHAND_MACROS
 #define test YakTest_Assert
@@ -201,6 +204,7 @@ YakTest_ShowResults(void)
     YakTest_Cleanup(); // Free memory // TODO: Do I need to call it each time I call results?
 }
 
-EXTERN_C_END
+}
+
 #define YAK_TEST 1
 #endif // !(YAK_TEST)
