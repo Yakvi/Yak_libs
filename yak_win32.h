@@ -264,7 +264,7 @@ YakWin32__GetClockFrequency(void)
 }
 
 inline clock
-YakPlatform_GetTime(void)
+YakPlatform_GetClock(void)
 {
     clock Result = {};
 
@@ -276,9 +276,9 @@ YakPlatform_GetTime(void)
 }
 
 inline float
-YakPlatform_StopTimer(clock Start, platform Platform)
+YakPlatform_MeasureTime(clock Start, platform Platform)
 {
-    clock End = YakPlatform_GetTime();
+    clock End = YakPlatform_GetClock();
     float Result = ((float)(End.Time - Start.Time) /
                     Platform.ClockFrequency);
     return (Result);

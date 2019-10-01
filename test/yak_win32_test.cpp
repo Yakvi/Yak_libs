@@ -10,13 +10,13 @@ main(void)
 
     LPSTR Prompt1 = "Hello world \n";
     
-    clock ClockStart = YakPlatform_GetTime();
+    clock ClockStart = YakPlatform_GetClock();
     YakPlatform_OutputConsole(Prompt1, lstrlenA(Prompt1), PlatformData);
-    f32 SecondsElapsed = YakPlatform_StopTimer(ClockStart, PlatformData);
+    f32 SecondsElapsed = YakPlatform_MeasureTime(ClockStart, PlatformData);
     
-    ClockStart = YakPlatform_GetTime();
+    ClockStart = YakPlatform_GetClock();
     printf(Prompt1);
-    SecondsElapsed = YakPlatform_StopTimer(ClockStart, PlatformData);
+    SecondsElapsed = YakPlatform_MeasureTime(ClockStart, PlatformData);
 
     YakPlatform_OutputConsole("Red ", lstrlenA("Red "), PlatformData, ConsoleColor_Red);
     YakPlatform_OutputConsole("Green ", lstrlenA("Green "), PlatformData, ConsoleColor_Green);

@@ -1,9 +1,10 @@
 #if !defined(YAK_STRING)
 
-//
-// NOTE: String utlities
-//
-typedef char const* str; // TODO: what happens to it in memory? Possible leaks?
+EXTERN_C_START
+
+typedef struct string {
+
+} string;
 
 bool
 Yak_StrCmp(char* A, char* B)
@@ -131,6 +132,7 @@ Yak_FillBuffer(char* Source, char* Dest, size_t MaxLength)
 
     return (Result);
 }
+EXTERN_C_END
 
 #define YAK_STRING
 #endif
