@@ -15,7 +15,7 @@ EXTERN_C_START
 struct memory;
 #define YakMem_Init(Size) Yak_AllocatePlatformMemory(Size)
 #define YakMem_GetSize(MemoryBank, Size, ...) Yak__PushMemory(Size, MemoryBank, ##__VA_ARGS__) // Memory is always 4 byte aligned
-#define YakMem_GetStruct(MemoryBank, Storage, ...) (Storage*)YakMem_GetSize(MemoryBank, sizeof(Storage), ##__VA_ARGS__)
+#define YakMem_GetStruct(MemoryBank, Structure, ...) (Structure*)YakMem_GetSize(MemoryBank, sizeof(Structure), ##__VA_ARGS__)
 #define YakMem_Reset(MemoryBank, ...) Yak__ResetMemory(MemoryBank, ##__VA_ARGS__)
 
 struct memory
