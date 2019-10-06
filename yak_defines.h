@@ -107,7 +107,9 @@ typedef double f64;
 #define Pi32 3.14159265359f
 #define Tau32 6.28318530717958647692f
 
+#define ArrayWithSize(Array) Array, sizeof(Array)
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
+#define ArrayWithCount(Input) Input, ArrayCount(Input)
 #define InArray(Count, Array) ((Count) < ArrayCount(Array))
 #define Min(a, b) ((a) < (b) ? (a) : (b))
 #define Max(a, b) ((a) > (b) ? (a) : (b))

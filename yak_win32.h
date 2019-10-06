@@ -59,7 +59,11 @@
 typedef struct file
 {
     unsigned int Size;
-    void* Contents;
+    union
+    {
+        char* Text;
+        void* Contents;
+    };
 } file;
 
 typedef struct platform
@@ -138,7 +142,7 @@ YakPlatform_ReadFile(char* Filename)
                     Yak_Log(Filename);
                     // Yak_Log("Error code: ");
                     // GetLastError(); // errhandlingapi.h
-                    YakPlatform_FreeMemory(Result.Contents);
+                    YakPlatform_FreeMemory(Result.Contents); // TODO: involve memory module
                     Result.Contents = 0;
                 }
             }
