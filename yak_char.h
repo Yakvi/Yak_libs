@@ -35,6 +35,18 @@ YakChar_Length(char *Input)
     return(Result);
 }
 
+inline size_t 
+YakChar_Copy(char* Source, char* Dest, size_t MaxLength)
+{
+    size_t At = 0;
+    while (*Source)
+    {
+        *Dest++ = *Source++;
+        Assert(At++ < MaxLength);
+    }
+    return (At);
+}
+
 inline bool
 YakChar_Compare(char* A, char* B)
 {

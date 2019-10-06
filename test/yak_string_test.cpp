@@ -3,7 +3,7 @@
 #include <yak_string.h>
 
 internal void
-CompareStrings()
+CompareCharStrings()
 {
     test_cat("Compare Strings");
     test(ch_eq("A", "A"), "Equal strings return true");
@@ -20,7 +20,7 @@ CompareStrings()
 }
 
 internal void
-NumbersToString()
+NumbersToChar()
 {
     test_cat("uint to char");
     char Out[33] = {};
@@ -60,25 +60,52 @@ internal void
 StringCreation()
 {
     test_cat("String creation");
-    string Output = {};
-    test(Output.Length == 0, "Initialized string's length is 0");
-    test(Output.Char == 0, "Char component is accessible");
-    test(Output.Raw == 0, "Raw component is accessible");
-    test(Output.Wide == 0, "Wide component is accessible");
+    {
+        string Output = {};
+        test(Output.Length == 0, "Initialized string's length is 0");
+        test(Output.Char == 0, "Char component is accessible");
+        test(Output.Raw == 0, "Raw component is accessible");
+        test(Output.Wide == 0, "Wide component is accessible");
+    }
 
-    test(ch_len("12345") == 5, "Char length is calculated");
-    Output = str("Hello");
-    test(Output.Length == 5, "Length is correct");
-    test(ch_eq(Output.Char, "Hello"), "Contents are correct");
+    {
+        test(ch_len("12345") == 5, "Char length is calculated");
+        string Output = str_s("Hello");
+
+        test(Output.Length == 5, "Length is correct");
+        test(ch_eq(Output.Char, "Hello"), "Contents are correct");
+
+        string Comparison = {};
+        Comparison.Length = 5;
+        Comparison.Char = "Hello";
+
+        test(str_eq(Output, Comparison), "Equal strings are evaluated correctly");
+        Comparison.Char = "World";
+        test(!str_eq(Output, Comparison), "Not equal strings are evaluated correctly");
+    }
+}
+
+internal void
+StringConcatenation()
+{
+    test_cat("StringConcatenation");
+    memory* Memory = mem_init(4096);
+    string* Test = str(Memory, "Hello", "World");
+    test(ch_eq(Test->Char, "Hello World"), "2 Strings composed");
+    Test = str(Memory, Test->Char, "! ", "How are you today?");
+    test(ch_eq(Test->Char, "Hello World! How are you today?"), "3 strings composed");
+    Test = str(Memory, "Hello", ", ", "World", "!");
+    test(ch_eq(Test->Char, "Hello, World!"), "4 strings composed");
 }
 
 int
 main()
 {
-    // CompareStrings();
-    // NumbersToString();
+    // CompareCharStrings();
+    // NumbersToChar();
     StringCreation();
+    StringConcatenation();
 
-    YakTest_ShowResults();
-    return (0);
+    test_output();
+    return 0;
 }
