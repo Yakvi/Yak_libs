@@ -116,7 +116,7 @@ function Run-Command([String]$Command)
 
 }
 Run-Command ./yak_string_test.exe
-Run-Command ./yak_memory_test.exe
-Run-Command ./yak_win32_test.exe
+# Run-Command ./yak_memory_test.exe
+# Run-Command ./yak_win32_test.exe
 
 popd
