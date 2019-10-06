@@ -81,12 +81,8 @@ typedef struct clock
 #ifdef DEBUG
 #include <debugapi.h>
 #define Yak_Log(Message) OutputDebugStringA(Message)
-#define Yak_TimerStart()
-#define Yak_TimerEnd(ClockStart)
 #else
 #define Yak_Log(Message)
-#define Yak_TimerStart()
-#define Yak_TimerEnd(ClockStart)
 #endif // DEBUG
 
 //
@@ -278,6 +274,8 @@ YakPlatform_GetClock(void)
     Result.Time = Clock.QuadPart;
     return Result;
 }
+
+// TODO: GetClockInSeconds
 
 inline float
 YakPlatform_MeasureTime(clock Start, platform Platform)

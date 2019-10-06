@@ -54,9 +54,7 @@ EXTERN_C_START
 //
 // NOTE: Types
 //
-#if !defined(internal)
-#define internal static
-#endif
+#define local static
 #define local_persist static
 #define global_variable static
 

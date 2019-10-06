@@ -96,7 +96,7 @@ Yak__PushMemory(memory_index SizeInit, memory* Memory, u32 Flags = MemoryFlag_Cl
 // Platform interaction
 //
 
-internal memory*
+local memory*
 Yak_AllocatePlatformMemory(memory_index Size)
 {
     memory* Result = (memory*)YakPlatform_GetMemory(Size + sizeof(memory));
