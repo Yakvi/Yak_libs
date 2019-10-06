@@ -20,6 +20,7 @@ extern "C"
 #define test_cat YakTest_Category
 #define test_clear YakTest_Cleanup
 #define test_output YakTest_ShowResults
+#define test_print YakTest_Print
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
 #include <stdio.h> 
@@ -32,6 +33,7 @@ extern "C"
         free(item);                  \
         item = temp;                 \
     }
+# define YakTest_Print(String, ...) printf(String, ##__VA_ARGS__); printf("\n")
 
 struct condition;
 struct test;
@@ -170,6 +172,7 @@ YakTest_Cleanup(void)
 static void
 YakTest_ShowResults(void)
 {
+    printf("\n===|===|=== TEST RESULTS ===|===|===\n\n");
     for (test* Test = YAK_GLOBAL__FirstTestSlot;
          Test;
          Test = Test->Next)
