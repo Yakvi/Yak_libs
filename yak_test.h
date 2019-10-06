@@ -20,7 +20,7 @@ extern "C"
 #define test_cat YakTest_Category
 #define test_clear YakTest_Cleanup
 #define test_output YakTest_ShowResults
-#define test_print YakTest_Print
+#define test_print YakTest_PrintWithNewLine
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
 #include <stdio.h> 
@@ -33,7 +33,8 @@ extern "C"
         free(item);                  \
         item = temp;                 \
     }
-# define YakTest_Print(String, ...) printf(String, ##__VA_ARGS__); printf("\n")
+# define YakTest_Print(String, ...) printf(String, ##__VA_ARGS__)
+# define YakTest_PrintWithNewLine(String, ...) YakTest_Print(String, ##__VA_ARGS__); YakTest_Print("\n")
 
 struct condition;
 struct test;
@@ -172,37 +173,39 @@ YakTest_Cleanup(void)
 static void
 YakTest_ShowResults(void)
 {
-    printf("\n===|===|=== TEST RESULTS ===|===|===\n\n");
+    YakTest_PrintWithNewLine("\n===|===|=== TEST RESULTS ===|===|===\n");
     for (test* Test = YAK_GLOBAL__FirstTestSlot;
          Test;
          Test = Test->Next)
     {
         if (Test->ConditionCount > 0)
         {
-            printf(" * %s:\n", Test->Description ? Test->Description : "Base asserts");
+            YakTest_PrintWithNewLine(" * %s:", Test->Description ? Test->Description : "Base asserts");
 
             for (condition* Condition = Test->FirstCondition;
                  Condition->Next; // we stop if we don't see a next condition, this one is empty
                  Condition = Condition->Next)
             {
-                printf("[");
+                YakTest_Print("[");
                 // NOTE: Colored text
                 if (Condition->Result)
                 {
-                    printf("\033[0;32m");
-                    printf("PASS");
+                    YakTest_Print("\033[0;32m");
+                    YakTest_Print("PASS");
                 }
                 else
                 {
-                    printf("\033[1;31m");
-                    printf("FAIL");
+                    YakTest_Print("\033[1;31m");
+                    YakTest_Print("FAIL");
                 }
-                printf("\033[0m");
+                YakTest_Print("\033[0m");
 
-                printf("]: %s\n", Condition->Description);
+                YakTest_PrintWithNewLine("]: %s", Condition->Description);
             }
         }
     }
+
+    YakTest_PrintWithNewLine("\n===|===|===|===|===|===|===|===|===\n");
 
     YakTest_Cleanup(); // Free memory // TODO: Do I need to call it each time I call results?
 }
