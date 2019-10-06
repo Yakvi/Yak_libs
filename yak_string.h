@@ -1,4 +1,6 @@
 #if !defined(YAK_STRING)
+/** In: Memory
+  * Out: String  */
 
 #include <yak_defines.h>
 #include <yak_memory.h>
@@ -6,13 +8,8 @@
 EXTERN_C_START
 
 #ifdef YAK_ENABLE_SHORTHAND_MACROS
+#define str YakStr_Create
 #endif // YAK_ENABLE_SHORTHAND_MACROS
-
-/**
-* Dependencies
-* In: Memory
-* Out: String
-* */
 
 typedef struct string
 {
@@ -25,6 +22,17 @@ typedef struct string
         // TODO: Chunks
     };
 } string;
+
+inline string
+YakStr_Create(char* Input)
+{
+    string Result = {};
+
+    Result.Length = YakChar_Length(Input);
+    Result.Char = Input;
+
+    return (Result);
+}
 
 // TODO: Convert to String
 inline bool

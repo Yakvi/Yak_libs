@@ -6,9 +6,10 @@ extern "C"
 #endif
 
 #ifdef YAK_ENABLE_SHORTHAND_MACROS
-#define str_eq YakStr_Compare
-#define u2char YakStr_UintToChar
-#define s2char YakStr_IntToChar
+#define ch_eq YakChar_Compare
+#define ch_len YakChar_Length
+#define u2char YakChar_UintToChar
+#define s2char YakChar_IntToChar
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
 #ifdef UNICODE
@@ -21,8 +22,21 @@ extern "C"
 // BOOKMARK: Utilities
 //
 
+inline unsigned int 
+YakChar_Length(char *Input)
+{
+    unsigned int Result = 0;
+
+    while (*Input++)
+    {
+        ++Result;
+    }
+
+    return(Result);
+}
+
 inline bool
-YakStr_Compare(char* A, char* B)
+YakChar_Compare(char* A, char* B)
 {
     bool Result = false;
 
@@ -68,7 +82,7 @@ YakStr__UintToCharRecursive(unsigned int Input, char* Output, int& Depth)
 }
 
 inline char*
-YakStr_UintToChar(unsigned int Input, char* Output)
+YakChar_UintToChar(unsigned int Input, char* Output)
 {
     int Depth = 0;
     YakStr__UintToCharRecursive(Input, Output, Depth);
@@ -78,7 +92,7 @@ YakStr_UintToChar(unsigned int Input, char* Output)
 }
 
 inline char*
-YakStr_IntToChar(int Input, char* Output)
+YakChar_IntToChar(int Input, char* Output)
 {
     int Depth = 0;
     if (Input < 0)
