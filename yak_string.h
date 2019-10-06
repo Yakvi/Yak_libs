@@ -20,6 +20,7 @@ typedef struct string
         wchar_t* Wide;
         char* Char;
         void* Raw;
+        // TODO: Chunks
     };
 } string;
 
@@ -123,6 +124,7 @@ Yak_IntToChar(int Input, char* Output)
     if (Input < 0)
     {
         Output[Depth++] = '-';
+        Input = -Input;
     }
 
     Yak__UintToCharRecursive(Input, Output, Depth);

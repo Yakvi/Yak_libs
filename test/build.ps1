@@ -90,7 +90,7 @@ $CompileTimer = [System.Diagnostics.Stopwatch]::StartNew()
 ### BOOKMARK: Actual compiler calls
 
 # NOTE: Yak_String Tests
-$yak_string = & cl -O2 $c ..\$srcDir\yak_string_test.cpp $linker $32linker
+$yak_string = & cl -Od $debug $c ..\$srcDir\yak_string_test.cpp $linker $32linker
 Output-Logs -data $yak_string -title "yak string tests"
 # NOTE: Yak_Memory Tests
 $yak_memory = & cl -O2 $c ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
