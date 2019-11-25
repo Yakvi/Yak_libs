@@ -2,7 +2,7 @@
 #include <yak_test.h>
 #include <yak_string.h>
 
-internal void
+local void
 CompareCharStrings()
 {
     test_cat("Compare Strings");
@@ -19,7 +19,7 @@ CompareCharStrings()
     test(!ch_eq("0Hello", "0Hey"), "Zero doesn't mean early exit");
 }
 
-internal void
+local void
 NumbersToChar()
 {
     test_cat("uint to char");
@@ -56,7 +56,7 @@ NumbersToChar()
     test(ch_eq(s2char(0, Out), "0"), "Pass 0 return 0");
 }
 
-internal void
+local void
 StringCreation()
 {
     test_cat("String creation");
@@ -85,7 +85,7 @@ StringCreation()
     }
 }
 
-internal void
+local void
 StringConcatenation()
 {
     test_cat("StringConcatenation");
