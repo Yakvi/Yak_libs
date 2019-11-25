@@ -90,10 +90,10 @@ $CompileTimer = [System.Diagnostics.Stopwatch]::StartNew()
 ### BOOKMARK: Actual compiler calls
 
 # NOTE: Yak_String Tests
-$yak_string = & cl -Od $debug $c ..\$srcDir\yak_string_test.cpp $linker $32linker
+$yak_string = & cl -O2 $debug $c ..\$srcDir\yak_string_test.cpp $linker $32linker
 Output-Logs -data $yak_string -title "yak string tests"
 # NOTE: Yak_Memory Tests
-$yak_memory = & cl -O2 $c ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
+$yak_memory = & cl -O2 $c $debug ..\$srcDir\yak_memory_test.cpp -Fmyak_memory_test $linker $32linker
 Output-Logs -data $yak_memory -title "yak memory tests"
 # NOTE: Yak_Win32 Tests
 $yak_win32 = & cl -O2 $c $debug ..\$srcDir\yak_win32_test.cpp -Fmyak_win32_test $linker $32linker
@@ -115,8 +115,8 @@ function Run-Command([String]$Command)
     Write-Host $([string]::Format("{0:d1}s {1:d3}ms", $ElapsedTime.seconds, $ElapsedTime.milliseconds)) -ForegroundColor "Green"
 
 }
-Run-Command ./yak_string_test.exe
-# Run-Command ./yak_memory_test.exe
+# Run-Command ./yak_string_test.exe
+Run-Command ./yak_memory_test.exe
 # Run-Command ./yak_win32_test.exe
 
 popd

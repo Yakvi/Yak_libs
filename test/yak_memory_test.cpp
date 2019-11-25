@@ -35,9 +35,13 @@ main()
     test((u8*)TestNumber == MainMemory->Vault + sizeof(u32), "Correct address should be returned upon next allocation");
     test(MainMemory->Used == ExpectedSize, "Memory should be deducted from the total");
 
-    YakMem_GetSize(MainMemory, 1);
+    char* TestChar = (char*)YakMem_GetSize(MainMemory, sizeof(char));
     ExpectedSize += 4;
-    test(MainMemory->Used == ExpectedSize, "Memory is always at least 4 bytes aligned");
+    test((u64)&TestChar % 4 == 0, "Memory is always at least 4 bytes aligned");
+
+    u64* TestU = (u64*)YakMem_GetSize(MainMemory, sizeof(u64), 8);
+    ExpectedSize += 8;
+    test((u64)&TestChar % 8 == 0, "Memory is 8 bytes aligned");
 
     test_cat("Getting space for Struct storage");
     struct test_struct

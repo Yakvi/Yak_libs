@@ -55,9 +55,12 @@ Yak__ResetMemory(memory* Memory, memory_index Size = 0)
 inline memory_index
 Yak__GetEffectiveSize(memory* Memory, memory_index DesiredSize, u32 Alignment)
 {
+    // TODO: This function must look at the final address!
     memory_index EffectiveSize = DesiredSize;
+    memory_index Mask = Alignment - 1;
 
-    Assert(Memory->Size >= Memory->Used + DesiredSize);
+    Assert((Alignment & Mask) == 0);
+    Assert(Memory->Size >= Memory->Used + Mask);
 
     memory_index CurrentBlock = (memory_index)Memory->Vault + Memory->Used + DesiredSize;
     memory_index AlignmentMask = Alignment - 1;
@@ -68,13 +71,11 @@ Yak__GetEffectiveSize(memory* Memory, memory_index DesiredSize, u32 Alignment)
         Offset = Alignment - (CurrentBlock & AlignmentMask);
     }
 
-    EffectiveSize += Offset;
-
-    return (EffectiveSize);
+    return (EffectiveSize + Offset);
 }
 
 inline void*
-Yak__PushMemory(memory_index SizeInit, memory* Memory, u32 Flags = MemoryFlag_Clear, u32 Alignment = 4)
+Yak__PushMemory(memory_index SizeInit, memory* Memory, u32 Alignment = 4, u32 Flags = MemoryFlag_Clear)
 {
     void* Result = Memory->Vault + Memory->Used;
 
@@ -93,7 +94,7 @@ Yak__PushMemory(memory_index SizeInit, memory* Memory, u32 Flags = MemoryFlag_Cl
 }
 
 //
-// Platform interaction
+// BOOKMARK: Platform interaction
 //
 
 local memory*
