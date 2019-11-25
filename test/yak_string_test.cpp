@@ -59,7 +59,7 @@ NumbersToChar()
 local void
 StringCreation()
 {
-    test_cat("String creation");
+    test_cat("String creation, Local Memory");
     {
         string Output = {};
         test(Output.Length == 0, "Initialized string's length is 0");
@@ -88,9 +88,9 @@ StringCreation()
 local void
 StringConcatenation()
 {
-    test_cat("StringConcatenation");
+    test_cat("String Concatenation, Allocated Memory");
     memory* Memory = mem_init(4096);
-    string* Test = str(Memory, "Hello", "World");
+    string* Test = str(Memory, "Hello ", "World");
     test(ch_eq(Test->Char, "Hello World"), "2 Strings composed");
     Test = str(Memory, Test->Char, "! ", "How are you today?");
     test(ch_eq(Test->Char, "Hello World! How are you today?"), "3 strings composed");

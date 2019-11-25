@@ -9,7 +9,7 @@ EXTERN_C_START
 
 #ifdef YAK_ENABLE_SHORTHAND_MACROS
 #define str YakStr_Compose
-#define str_s(Char) *str(0, Char)
+#define str_s(Char) YakStr_CreateSimple(Char)
 #define str_const YakStr_CreateSimple
 #define str_eq YakStr_Compare
 #endif // YAK_ENABLE_SHORTHAND_MACROS
