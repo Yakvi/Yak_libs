@@ -59,7 +59,7 @@ main()
     test(MainMemory->Used == 0, "Memory has reset used memory to 0");
 
     MainMemory->Vault[0] = 'a';
-    char* A = (char*)YakMem_GetSize(MainMemory, sizeof(char), MemoryFlag_NoClear);
+    char* A = (char*)YakMem_GetSize(MainMemory, sizeof(char), 4, MemoryFlag_NoClear);
     test(*A == 'a', "No clear flags work properly");
 
     test_output();

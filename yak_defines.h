@@ -6,6 +6,8 @@
     {
 #define EXTERN_C_END }
 #else
+#define true 1
+#define false 0
 #define EXTERN_C_START
 #define EXTERN_C_END
 #endif
