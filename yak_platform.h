@@ -8,9 +8,9 @@
 #endif // YAK_ENABLE_SHORTHAND_MACROS
 
 // PLATFORM API
-struct file;
-struct platform;
-struct clock;
+typedef struct file file;
+typedef struct platform platform;
+typedef struct clock clock;
 
 static platform YakPlatform_Init();
 

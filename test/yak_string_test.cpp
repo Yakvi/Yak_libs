@@ -1,6 +1,6 @@
 #define YAK_ENABLE_SHORTHAND_MACROS
-#include <yak_test.h>
 #include <yak_string.h>
+#include <yak_test.h>
 
 local void
 CompareCharStrings()

@@ -8,23 +8,23 @@ main(void)
 {
     platform PlatformData = YakPlatform_Init();
 
-    LPSTR Prompt1 = "Color tests \n";
+    char* Prompt1 = "Color tests \n";
     
     clock ClockStart = YakPlatform_GetClock();
-    YakPlatform_OutputConsole(Prompt1, lstrlenA(Prompt1), PlatformData);
+    YakPlatform_OutputConsole(Prompt1, 14, PlatformData);
     f32 SecondsElapsed = YakPlatform_MeasureTime(ClockStart, PlatformData);
     
     ClockStart = YakPlatform_GetClock();
     printf(Prompt1);
     SecondsElapsed = YakPlatform_MeasureTime(ClockStart, PlatformData);
 
-    YakPlatform_OutputConsole("Red ", lstrlenA("Red "), PlatformData, ConsoleColor_Red);
-    YakPlatform_OutputConsole("Green ", lstrlenA("Green "), PlatformData, ConsoleColor_Green);
-    YakPlatform_OutputConsole("Blue ", lstrlenA("Blue "), PlatformData, ConsoleColor_Blue);
-    YakPlatform_OutputConsole("Yellow ", lstrlenA("Yellow "), PlatformData, ConsoleColor_Yellow);
-    YakPlatform_OutputConsole("Cyan ", lstrlenA("Cyan "), PlatformData, ConsoleColor_Cyan);
-    YakPlatform_OutputConsole("Magenta ", lstrlenA("Magenta "), PlatformData, ConsoleColor_Magenta);
-    YakPlatform_OutputConsole("White\n", lstrlenA("White\n"), PlatformData, ConsoleColor_White);
+    YakPlatform_OutputConsole("Red ", 4, PlatformData, ConsoleColor_Red);
+    YakPlatform_OutputConsole("Green ", 6, PlatformData, ConsoleColor_Green);
+    YakPlatform_OutputConsole("Blue ", 5, PlatformData, ConsoleColor_Blue);
+    YakPlatform_OutputConsole("Yellow ", 7, PlatformData, ConsoleColor_Yellow);
+    YakPlatform_OutputConsole("Cyan ", 5, PlatformData, ConsoleColor_Cyan);
+    YakPlatform_OutputConsole("Magenta ", 8, PlatformData, ConsoleColor_Magenta);
+    YakPlatform_OutputConsole("White\n", 6, PlatformData, ConsoleColor_White);
 
     test(true, "This succeeds");
     test(false, "This fails");

@@ -1,61 +1,5 @@
 #if !defined(YAK_WIN32)
 
-// TODO: Printf (with colored text)
-// TODO: Diagnostics (clock cycles)
-
-#if defined _WIN32
-
-#define WIN32_LEAN_AND_MEAN
-#define NOGDICAPMASKS
-#define NOVIRTUALKEYCODES
-#define NOWINMESSAGES
-#define NOWINSTYLES
-#define NOSYSMETRICS
-#define NOMENUS
-#define NOICONS
-#define NOKEYSTATES
-#define NOSYSCOMMANDS
-#define NORASTEROPS
-#define NOSHOWWINDOW
-#define OEMRESOURCE
-#define NOATOM
-#define NOCLIPBOARD
-#define NOCOLOR
-#define NOCTLMGR
-#define NODRAWTEXT
-#define NOGDI
-#define NOKERNEL
-// #define NOUSER
-#define NONLS
-// #define NOMB
-#define NOMEMMGR
-#define NOMETAFILE
-#define NOMINMAX
-// #define NOMSG
-#define NOOPENFILE
-#define NOSCROLL
-#define NOSERVICE
-#define NOSOUND
-#define NOTEXTMETRIC
-#define NOWH
-#define NOWINOFFSETS
-#define NOCOMM
-#define NOKANJI
-#define NOHELP
-#define NOPROFILER
-#define NODEFERWINDOWPOS
-#define NOMCX
-
-#ifdef APIENTRY
-#undef APIENTRY
-#endif // APIENTRY
-
-#include <windows.h>
-// #include <winnt.h>
-#include <fileapi.h>   // kernel32.lib
-#include <handleapi.h> // kernel32.lib
-#include <memoryapi.h> // kernel32.lib
-
 typedef struct file
 {
     unsigned int Size;
@@ -70,7 +14,7 @@ typedef struct platform
 {
     bool IsInitialized;
     float ClockFrequency;
-    HANDLE ConsoleOutHandle;
+    void* ConsoleOutHandle;
 } platform;
 
 typedef struct clock
@@ -79,14 +23,130 @@ typedef struct clock
 } clock;
 
 #ifdef DEBUG
-#include <debugapi.h>
 #define Yak_Log(Message) OutputDebugStringA(Message)
 #else
 #define Yak_Log(Message)
 #endif // DEBUG
 
 //
-// BOOKMARK: Memory
+// BOOKMARK: Windows API
+//
+// #include <windows.h>
+#ifndef _WINDOWS_
+typedef union
+{
+    struct
+    {
+        unsigned long LowPart;
+        long HighPart;
+    } DUMMYSTRUCTNAME;
+    struct
+    {
+        unsigned long LowPart;
+        long HighPart;
+    } u;
+    long long QuadPart;
+} LARGE_INTEGER;
+typedef struct
+{
+    short X;
+    short Y;
+} COORD;
+typedef struct
+{
+    short Left;
+    short Top;
+    short Right;
+    short Bottom;
+} SMALL_RECT;
+typedef struct
+{
+    COORD dwSize;
+    COORD dwCursorPosition;
+    unsigned short wAttributes;
+    SMALL_RECT srWindow;
+    COORD dwMaximumWindowSize;
+} CONSOLE_SCREEN_BUFFER_INFO;
+typedef struct
+{
+    union
+    {
+        wchar_t UnicodeChar;
+        char AsciiChar;
+    } Char;
+    unsigned short Attributes;
+} CHAR_INFO;
+
+typedef struct
+{
+    unsigned long nLength;
+    void* lpSecurityDescriptor;
+    int bInheritHandle;
+} SECURITY_ATTRIBUTES, *PSECURITY_ATTRIBUTES, *LPSECURITY_ATTRIBUTES;
+
+typedef struct
+{
+    unsigned __int64 Internal;
+    unsigned __int64 InternalHigh;
+    union
+    {
+        struct
+        {
+            unsigned long Offset;
+            unsigned long OffsetHigh;
+        } DUMMYSTRUCTNAME;
+        void* Pointer;
+    } DUMMYUNIONNAME;
+
+    void* hEvent;
+} OVERLAPPED, *LPOVERLAPPED;
+
+#define MEM_RESERVE 0x00002000
+#define MEM_COMMIT 0x00001000
+#define PAGE_READWRITE 0x04
+#define MEM_RELEASE 0x00008000
+
+#define GENERIC_READ (0x80000000L)
+#define FILE_SHARE_READ 0x00000001
+#define OPEN_EXISTING 3
+
+#define FOREGROUND_BLUE 0x0001      // text color contains blue.
+#define FOREGROUND_GREEN 0x0002     // text color contains green.
+#define FOREGROUND_RED 0x0004       // text color contains red.
+#define FOREGROUND_INTENSITY 0x0008 // text color is intensified.
+#define BACKGROUND_BLUE 0x0010      // background color contains blue.
+#define BACKGROUND_GREEN 0x0020     // background color contains green.
+#define BACKGROUND_RED 0x0040       // background color contains red.
+#define STD_OUTPUT_HANDLE ((unsigned long)-11)
+
+#define INVALID_HANDLE_VALUE ((void*)(long long)-1)
+
+extern "C" {
+void* __stdcall VirtualAlloc(void* lpAddress, size_t Size, unsigned int AllocationType, unsigned int Protect);
+
+int __stdcall VirtualFree(void* lpAddress, size_t dwSize, unsigned long dwFreeType);
+
+void* __stdcall GetStdHandle(unsigned long nStdHandle);
+int __stdcall SetConsoleTextAttribute(void* hConsoleOutput, unsigned short wAttributes);
+int __stdcall WriteConsoleA(void* hConsoleOutput, const void* lpBuffer, unsigned long nNumberOfCharsToWrite, unsigned long* lpNumberOfCharsWritten, void* lpReserved);
+
+int __stdcall ScrollConsoleScreenBufferA(void* hConsoleOutput, const SMALL_RECT* lpScrollRectangle, const SMALL_RECT* lpClipRectangle, COORD dwDestinationOrigin, const CHAR_INFO* lpFill);
+int __stdcall SetConsoleCursorPosition(void* hConsoleOutput, COORD dwCursorPosition);
+
+int __stdcall GetFileSizeEx(void* hFile, LARGE_INTEGER* lpFileSize);
+unsigned long __stdcall GetLastError();
+void* __stdcall CreateFileA(const char* lpFileName, unsigned long dwDesiredAccess, unsigned long dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, unsigned long dwCreationDisposition, unsigned long dwFlagsAndAttributes, void* hTemplateFile);
+int __stdcall ReadFile(void* hFile, void* lpBuffer, unsigned long nNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped);
+int __stdcall CloseHandle(void* hObject);
+
+void __stdcall OutputDebugStringA(char* string);
+
+int __stdcall QueryPerformanceFrequency(LARGE_INTEGER* lpFrequency);
+int __stdcall QueryPerformanceCounter(LARGE_INTEGER* lpPerformanceCount);
+}
+#endif
+//
+// BOOKMARK: Memory, kernel32.lib
 //
 
 static void*
@@ -107,24 +167,23 @@ YakPlatform_FreeMemory(void* Memory)
 //
 // BOOKMARK: File i/o
 //
-
 // TODO: Return by pointer?
 static file
 YakPlatform_ReadFile(char* Filename)
 {
     file Result = {};
 
-    HANDLE FileHandle = CreateFileA(Filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+    void* FileHandle = CreateFileA(Filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     if (FileHandle != INVALID_HANDLE_VALUE)
     {
         LARGE_INTEGER FileSize;
         if (GetFileSizeEx(FileHandle, &FileSize))
         {
-            WORD FileSize32 = (WORD)FileSize.QuadPart;
+            unsigned short FileSize32 = (unsigned short)FileSize.QuadPart;
             Result.Contents = YakPlatform_GetMemory(FileSize32); // TODO: involve memory here
             if (Result.Contents)
             {
-                DWORD BytesRead;
+                unsigned long BytesRead;
                 if (ReadFile(FileHandle, Result.Contents, FileSize32, &BytesRead, 0) &&
                     (FileSize32 == BytesRead))
                 {
@@ -137,7 +196,7 @@ YakPlatform_ReadFile(char* Filename)
                     Yak_Log("File name:");
                     Yak_Log(Filename);
                     // Yak_Log("Error code: ");
-                    // GetLastError(); // errhandlingapi.h
+                    // GetLastError();
                     YakPlatform_FreeMemory(Result.Contents); // TODO: involve memory module
                     Result.Contents = 0;
                 }
@@ -186,10 +245,10 @@ enum ConsoleColor
     ConsoleColor_White = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY,
 };
 
-inline HANDLE
+inline void*
 YakWin32__GetConsoleHandle(unsigned int HandleType)
 {
-    HANDLE Result = GetStdHandle(HandleType);
+    void* Result = GetStdHandle(HandleType);
     if (Result == INVALID_HANDLE_VALUE)
     {
         Yak_Log("Error during console handle initialization");
@@ -198,7 +257,7 @@ YakWin32__GetConsoleHandle(unsigned int HandleType)
 }
 
 inline void
-YakPlatform_OutputConsole(char* String, u32 Length, platform Platform, WORD Color = ConsoleColor_White)
+YakPlatform_OutputConsole(char* String, u32 Length, platform Platform, unsigned short Color = ConsoleColor_White)
 {
     if (SetConsoleTextAttribute(Platform.ConsoleOutHandle, Color))
     {
@@ -216,7 +275,7 @@ YakPlatform_OutputConsole(char* String, u32 Length, platform Platform, WORD Colo
 // These two are only needed if the console mode has disabled line input mode.
 // (OldMode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT))
 inline void
-Yak__ScrollScreenBuffer(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
+Yak__ScrollScreenBuffer(void* OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
 {
     SMALL_RECT srctScrollRect = {};
 
@@ -227,11 +286,11 @@ Yak__ScrollScreenBuffer(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuff
     COORD Dest = {};
     CHAR_INFO Fill = {};
 
-    ScrollConsoleScreenBuffer(OutHandle, &srctScrollRect, 0, Dest, &Fill);
+    ScrollConsoleScreenBufferA(OutHandle, &srctScrollRect, 0, Dest, &Fill);
 }
 
 inline void
-Yak__NewLine(HANDLE OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
+Yak__NewLine(void* OutHandle, CONSOLE_SCREEN_BUFFER_INFO* ScreenBuffer)
 {
     ScreenBuffer->dwCursorPosition.X = 0;
 
@@ -299,49 +358,6 @@ YakPlatform_Init(void)
     Platform.IsInitialized = true;
     return (Platform);
 }
-
-#undef WIN32_LEAN_AND_MEAN
-#undef NOGDICAPMASKS
-#undef NOVIRTUALKEYCODES
-#undef NOWINMESSAGES
-#undef NOWINSTYLES
-#undef NOSYSMETRICS
-#undef NOMENUS
-#undef NOICONS
-#undef NOKEYSTATES
-#undef NOSYSCOMMANDS
-#undef NORASTEROPS
-#undef NOSHOWWINDOW
-#undef OEMRESOURCE
-#undef NOATOM
-#undef NOCLIPBOARD
-#undef NOCOLOR
-#undef NOCTLMGR
-#undef NODRAWTEXT
-#undef NOGDI
-#undef NOKERNEL
-#undef NOUSER
-#undef NONLS
-#undef NOMB
-#undef NOMEMMGR
-#undef NOMETAFILE
-#undef NOMINMAX
-#undef NOMSG
-#undef NOOPENFILE
-#undef NOSCROLL
-#undef NOSERVICE
-#undef NOSOUND
-#undef NOTEXTMETRIC
-#undef NOWH
-#undef NOWINOFFSETS
-#undef NOCOMM
-#undef NOKANJI
-#undef NOHELP
-#undef NOPROFILER
-#undef NODEFERWINDOWPOS
-#undef NOMCX
-
-#endif
 
 #define YAK_WIN32 1
 #endif
