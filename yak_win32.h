@@ -23,6 +23,9 @@ typedef struct clock
 } clock;
 
 #ifdef DEBUG
+#ifdef Assert
+#define Assert_HR(HRESULT) Assert(!HRESULT) // ensure result is 0
+#endif // DEBUG
 #define Yak_Log(Message) OutputDebugStringA(Message)
 #else
 #define Yak_Log(Message)
