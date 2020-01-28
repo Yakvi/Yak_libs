@@ -28,6 +28,7 @@ typedef struct clock
 #endif // DEBUG
 #define Yak_Log(Message) OutputDebugStringA(Message)
 #else
+#define Assert_HR(Expression) Expression
 #define Yak_Log(Message)
 #endif // DEBUG
 
