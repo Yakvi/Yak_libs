@@ -19,17 +19,17 @@ EXTERN_C_START
 #ifdef DEBUG
 #define Assert(Expression) \
     if (!(Expression)) { *(int*)0 = 0; } // Point to sector 0, immediately crash
+#define Assert_exec(Expression) Assert(Expression)
 #else
 #define Assert(Expression)
+#define Assert_exec(Expression) Expression
 #endif
 
 #define InvalidCodePath Assert(!"InvalidCodePath")
 #define InvalidDefaultCase \
-    default:               \
-    {                      \
+    default: {             \
         InvalidCodePath;   \
-    }                      \
-    break
+    } break
 
 //
 // NOTE: Compilers
