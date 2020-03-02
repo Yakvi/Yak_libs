@@ -96,10 +96,10 @@ typedef float f32;
 typedef double f64;
 #endif // COMPILER_MSVC
 
-#define Kilobytes(Value) ((Value)*1024LL)
-#define Megabytes(Value) (Kilobytes(Value) * 1024LL)
-#define Gigabytes(Value) (Megabytes(Value) * 1024LL)
-#define Terabytes(Value) (Gigabytes(Value) * 1024LL)
+#define KiB(Value) ((Value)*1024LL)
+#define MiB(Value) (KiB(Value) * 1024LL)
+#define GiB(Value) (MiB(Value) * 1024LL)
+#define TiB(Value) (GiB(Value) * 1024LL)
 
 //
 // NOTE: Array Utilities
